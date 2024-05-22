@@ -25,9 +25,11 @@ add_executable(${name} ${sources})
 source_group("" FILES ${sources})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../ FILES ${sources})
 
-target_link_libraries(${name} winmm)
+target_link_libraries(${name} winmm d3d11 d3dcompiler dxguid comctl32)
 
 if(MSVC)
+
+	add_definitions(-D_UNICODE)
 
 	target_link_options(${name} PUBLIC
 		$<$<CONFIG:Debug>:/NODEFAULTLIB:libcmtd.lib>
