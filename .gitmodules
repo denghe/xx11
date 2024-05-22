@@ -1,0 +1,6 @@
+[submodule "3rd/nameof"]
+	path = 3rd/nameof
+	url = https://github.com/Neargye/nameof.git
+[submodule "3rd/xx"]
+	path = 3rd/xx
+	url = https://github.com/denghe/xx.git
