@@ -42,7 +42,7 @@ LRESULT CALLBACK Looper::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
 
 int Looper::Run() {
-    MSG msg = { 0 };
+    MSG msg{};
     while (WM_QUIT != msg.message) {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
