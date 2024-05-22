@@ -7,6 +7,9 @@ int Looper::Init(HINSTANCE hInstance, int nCmdShow) {
         return __LINE__;
     if (wndHeight <= 0)
         return __LINE__;
+    // ...
+    InitMessageTexts();
+    // ...
     if (int r = InitWindow(hInstance, nCmdShow))
         return r;
     if (int r = InitDevice())
@@ -16,18 +19,28 @@ int Looper::Init(HINSTANCE hInstance, int nCmdShow) {
 }
 
 
+Looper::~Looper() {
+    // todo: clear others contain devices
+    CleanupDevice();
+}
+
+
 LRESULT CALLBACK Looper::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     PAINTSTRUCT ps;
     HDC hdc;
+
+#ifndef NDEBUG
+    DumpMessage(message, wParam, lParam);
+#endif
 
     switch (message) {
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
         EndPaint(hWnd, &ps);
-        break;
+        break; 
 
     case WM_DESTROY:
-        PostQuitMessage(0);
+        PostQuitMessage(__LINE__);
         break;
 
         // Note that this tutorial does not handle resizing (WM_SIZE) requests,
@@ -36,8 +49,7 @@ LRESULT CALLBACK Looper::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
-
-    return 0;
+    return 0;   // avoid compile error
 }
 
 
@@ -53,7 +65,6 @@ int Looper::Run() {
             g_pSwapChain->Present(0, 0);
         }
     }
-    CleanupDevice();
     return (int)msg.wParam;
 }
 
