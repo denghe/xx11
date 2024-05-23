@@ -21,7 +21,7 @@ int Looper::Init(HINSTANCE hInstance, int nCmdShow) {
 
 Looper::~Looper() {
     // todo: clear others contain devices
-    CleanupDevice();
+    if (immediateContext) immediateContext->ClearState();
 }
 
 
@@ -61,8 +61,8 @@ int Looper::Run() {
             DispatchMessage(&msg);
         } else {
             // Just clear the backbuffer
-            g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, DirectX::Colors::MidnightBlue);
-            g_pSwapChain->Present(0, 0);
+            immediateContext->ClearRenderTargetView(renderTargetView.Get(), DirectX::Colors::MidnightBlue);
+            swapChain->Present(0, 0);
         }
     }
     return (int)msg.wParam;
@@ -73,13 +73,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    g_looper.className = L"xx2d_dx11_engine_main_window";
-    g_looper.title = L"xx2d engine ( dx11 )";
-    g_looper.wndWidth = 1280;
-    g_looper.wndHeight = 720;
+    gLooper.className = L"xx2d_dx11_engine_main_window";
+    gLooper.title = L"xx2d engine ( dx11 )";
+    gLooper.wndWidth = 1280;
+    gLooper.wndHeight = 720;
 
-    if (int r = g_looper.Init(hInstance, nCmdShow)) 
+    if (int r = gLooper.Init(hInstance, nCmdShow))
         return 0;
 
-    return g_looper.Run();
+    return gLooper.Run();
 }

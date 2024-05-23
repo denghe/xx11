@@ -6,19 +6,12 @@
 #include <xx_task.h>
 #include <d3d11_1.h>
 #include <directxcolors.h>
+#include <wrl/client.h>		// ComPtr
+
+template<typename T>
+using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 struct Looper;
-extern Looper					g_looper;
-
-extern HWND						g_hWnd;
-extern D3D_DRIVER_TYPE			g_driverType;
-extern D3D_FEATURE_LEVEL		g_featureLevel;
-extern ID3D11Device*			g_pd3dDevice;
-extern ID3D11Device1*			g_pd3dDevice1;
-extern ID3D11DeviceContext*		g_pImmediateContext;
-extern ID3D11DeviceContext1*	g_pImmediateContext1;
-extern IDXGISwapChain*			g_pSwapChain;
-extern IDXGISwapChain1*			g_pSwapChain1;
-extern ID3D11RenderTargetView*	g_pRenderTargetView;
+extern Looper					gLooper;
 
 #endif
