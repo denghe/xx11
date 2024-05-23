@@ -2,7 +2,16 @@
 #include "looper.h"
 
 
-int Looper::Init(HINSTANCE hInstance, int nCmdShow) {
+int Looper::Init(HINSTANCE hInstance, int nCmdShow, bool showConsole =
+#ifndef NDEBUG
+    true
+#else
+    false
+#endif
+) {
+    if (showConsole) {
+        ShowConsole();
+    }
     if (wndWidth <= 0)
         return __LINE__;
     if (wndHeight <= 0)

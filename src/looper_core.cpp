@@ -47,6 +47,28 @@ int Looper::InitWindow(HINSTANCE hInstance, int nCmdShow) {
 }
 
 
+void Looper::ShowConsole() {
+    ::AllocConsole();
+    FILE* tmp{};
+    freopen_s(&tmp, "CONIN$", "r", stdin);
+    freopen_s(&tmp, "CONOUT$", "w", stdout);
+    freopen_s(&tmp, "CONOUT$", "w", stderr);
+    ::SetConsoleOutputCP(CP_UTF8);
+
+    auto ConfigConsoleMode = [](DWORD id) {
+        auto handle = ::GetStdHandle(id);
+        if (handle) {
+            DWORD mode{};
+            ::GetConsoleMode(handle, &mode);
+            mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            ::SetConsoleMode(handle, mode);
+        }
+        };
+    ConfigConsoleMode(STD_OUTPUT_HANDLE);
+    ConfigConsoleMode(STD_ERROR_HANDLE);
+}
+
+
 int Looper::InitDevice() {
     HRESULT hr{ S_OK };
 
@@ -192,7 +214,7 @@ https://wiki.winehq.org/List_Of_Windows_Messages
 */
 void Looper::InitMessageTexts() {
     assert(messageTexts.empty());
-#define REGISTER_MESSAGE_TEXT(msg) messageTexts[msg] = L#msg;
+#define REGISTER_MESSAGE_TEXT(msg) messageTexts[msg] = #msg;
     REGISTER_MESSAGE_TEXT(WM_NULL);
     REGISTER_MESSAGE_TEXT(WM_CREATE);
     REGISTER_MESSAGE_TEXT(WM_DESTROY);
@@ -470,23 +492,16 @@ void Looper::InitMessageTexts() {
 
 
 void Looper::DumpMessage(UINT message, WPARAM wParam, LPARAM lParam) {
-    std::wstring ws;
+    std::string s;
     if (auto iter = messageTexts.find(message); iter != messageTexts.end()) {
-        ws.append(L"message = ");
-        ws.append(iter->second);
-        ws.append(L" wParam = ");
-        ws.append(std::to_wstring(wParam));
-        ws.append(L" lParam = ");
-        ws.append(std::to_wstring(lParam));
-        ws.push_back(L'\n');
+        xx::Append(s, "message = ", iter->second, " wParam = ", wParam, " lParam = ", lParam, '\n');
     } else {
         if (message > 0x0400) {
-            ws.append(L"RESERVED message = ");
+            s.append("RESERVED message = ");
         } else {
-            ws.append(L"UNKNOWN message = ");
+            s.append("UNKNOWN message = ");
         }
-        ws.append(std::to_wstring(message));
-        ws.push_back(L'\n');
+        xx::Append(s,message, '\n');
     }
-    OutputDebugString(ws.c_str());
+    printf("%s", s.c_str());
 }

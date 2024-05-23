@@ -25,13 +25,14 @@ public:
 	int wndWidth{}, wndHeight{};		// not include title, border, ...
 
 	// return 0 == success
-	int Init(HINSTANCE hInstance, int nCmdShow);
+	int Init(HINSTANCE hInstance, int nCmdShow, bool showConsole);
 	int Run();
 
 protected:
-	inline static std::unordered_map<UINT, std::wstring> messageTexts;
+	inline static std::unordered_map<UINT, std::string> messageTexts;
 	static void DumpMessage(UINT message, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static void ShowConsole();
 
 	int InitWindow(HINSTANCE hInstance, int nCmdShow);
 	int InitDevice();
