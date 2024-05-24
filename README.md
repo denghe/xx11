@@ -12,6 +12,8 @@ https://www.cnblogs.com/X-Jun/p/9069608.html
 
 https://www.bilibili.com/video/BV1KC4y1Y7tc
 
+https://directx11.tech/#/misc/Compile
+
 # game input
 
 https://learn.microsoft.com/zh-cn/gaming/gdk/_content/gc/input/overviews/input-overview
