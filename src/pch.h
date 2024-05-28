@@ -4,14 +4,19 @@
 #define _XX11_H_
 
 #include <xx_task.h>
+#include <xx_xy.h>
+
 #include <d3d11_1.h>
 #include <directxcolors.h>
+#include <d3dcompiler.h>
 #include <wrl/client.h>		// ComPtr
 
 template<typename T>
 using ComPtr = Microsoft::WRL::ComPtr<T>;
 
+using XY = xx::XY;
+
 struct Looper;
-extern Looper					gLooper;
+extern Looper gLooper;
 
 #endif

@@ -24,6 +24,8 @@ int Looper::Init(HINSTANCE hInstance, int nCmdShow, bool showConsole =
     if (int r = InitDevice())
         return r;
     // ...
+    InitShaders();
+    // ...
     return 0;
 }
 

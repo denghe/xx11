@@ -1,8 +1,11 @@
 ﻿#pragma once
 #include "pch.h"
+#include "shader.h"
 
 struct Looper {
 protected:
+	friend Shader;
+
 	HWND hWnd{};
 	D3D_DRIVER_TYPE driverType{ D3D_DRIVER_TYPE_NULL };
 	D3D_FEATURE_LEVEL featureLevel{ D3D_FEATURE_LEVEL_11_0 };
@@ -13,6 +16,8 @@ protected:
 	ComPtr<IDXGISwapChain> swapChain;
 	ComPtr<IDXGISwapChain1> swapChain1;
 	ComPtr<ID3D11RenderTargetView> renderTargetView;
+
+	Shader_QuadInstanceData shader_QuadInstanceData;
 
 public:
 	Looper() = default;
@@ -30,11 +35,13 @@ public:
 
 protected:
 	inline static std::unordered_map<UINT, std::string> messageTexts;
+	static void InitMessageTexts();
 	static void DumpMessage(UINT message, WPARAM wParam, LPARAM lParam);
+
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	static void ShowConsole();
 
 	int InitWindow(HINSTANCE hInstance, int nCmdShow);
 	int InitDevice();
-	void InitMessageTexts();
+	int InitShaders();
 };
