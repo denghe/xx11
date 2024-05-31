@@ -32,6 +32,7 @@ public:
 	// return 0 == success
 	int Init(HINSTANCE hInstance, int nCmdShow, bool showConsole);
 	int Run();
+	void Render();
 
 protected:
 	inline static std::unordered_map<UINT, std::string> messageTexts;

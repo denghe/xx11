@@ -18,7 +18,7 @@ void Looper::DumpMessage(UINT message, WPARAM wParam, LPARAM lParam) {
         }
         xx::Append(s, message, '\n');
     }
-    //printf("%s", s.c_str());
+    printf("%s", s.c_str());
 }
 
 

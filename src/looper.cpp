@@ -58,24 +58,35 @@ LRESULT CALLBACK Looper::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         // so we created the window without the resize border.
 
     default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
+        XX_ASSUME(false);
     }
-    return 0;   // avoid compile error
+
+    return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
 
 int Looper::Run() {
     MSG msg{};
+
+    /*volatile*/ bool stoped{};
+    std::thread t{ [&] {
+        while (!stoped) {
+            Render();
+        }
+    } };
+
     while (WM_QUIT != msg.message) {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         } else {
-            // Just clear the backbuffer
-            immediateContext->ClearRenderTargetView(renderTargetView.Get(), DirectX::Colors::MidnightBlue);
-            swapChain->Present(0, 0);
+            //Render();
         }
     }
+
+    stoped = true;
+    t.join();
+
     return (int)msg.wParam;
 }
 
