@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "pch.h"
 #include "shader.h"
+#include "shader_quadinstance.h"
+#include "shader_test1.h"
 
 struct Looper {
 protected:
@@ -17,7 +19,9 @@ protected:
 	ComPtr<IDXGISwapChain1> swapChain1;
 	ComPtr<ID3D11RenderTargetView> renderTargetView;
 
-	Shader_QuadInstanceData shader_QuadInstanceData;
+	Shader_QuadInstance shader_QuadInstance;
+	Shader_Test1 shader_Test1;
+	// ... more shader here
 
 public:
 	Looper() = default;

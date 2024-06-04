@@ -68,7 +68,7 @@ LRESULT CALLBACK Looper::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 int Looper::Run() {
     MSG msg{};
 
-    /*volatile*/ bool stoped{};
+    bool stoped{};
     std::thread t{ [&] {
         while (!stoped) {
             Render();
@@ -79,9 +79,7 @@ int Looper::Run() {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-        } else {
-            //Render();
-        }
+        } // else Render();
     }
 
     stoped = true;

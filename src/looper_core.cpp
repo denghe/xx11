@@ -16,9 +16,9 @@ int Looper::InitWindow(HINSTANCE hInstance, int nCmdShow) {
     c.lpfnWndProc = Looper::WndProc;
     c.hInstance = hInstance;
     c.lpszClassName = className.c_str();
+    c.hCursor = LoadCursor(nullptr, IDC_ARROW);
     //c.cbClsExtra = 0;
     //c.cbWndExtra = 0;
-    //c.hCursor = LoadCursor(nullptr, IDC_ARROW);
     //c.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     //c.lpszMenuName = nullptr;
     //c.hIcon = LoadIcon(hInstance, (LPCTSTR)IDI_TUTORIAL1);
@@ -206,10 +206,4 @@ int Looper::InitDevice() {
     immediateContext->RSSetViewports(1, &vp);
 
     return 0;
-}
-
-void Looper::Render() {
-    // Just clear the backbuffer
-    immediateContext->ClearRenderTargetView(renderTargetView.Get(), DirectX::Colors::MidnightBlue);
-    swapChain->Present(0, 0);
 }
