@@ -17,13 +17,19 @@ struct Shader {
 
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
+    ComPtr<ID3D11InputLayout> vil;
+    ComPtr<ID3D11Buffer> buf;
 
 protected:
-    ID3D11Device1* d3dDevice(); // return gLooper.d3dDevice1.Get();
+    ID3D11Device1* d3dDevice();                             // return gLooper.d3dDevice1.Get();
+    ID3D11DeviceContext1* immediateContext();               // return gLooper.immediateContext1.Get();
 
-    int CompileShader(std::string_view vs_src, std::string_view ps_src = {}
-        , char const* vs_main = "vs_main", char const* vs_ver = "vs_4_0"
-        , char const* ps_main = "ps_main", char const* ps_ver = "ps_4_0");
+    int CompileShader(std::string_view vsSrc, D3D11_INPUT_ELEMENT_DESC const* layoutDescs, UINT layoutDescLen
+        , std::string_view psSrc = {}
+        , char const* vsMain = "vs_main", char const* vsVer = "vs_4_0"
+        , char const* psMain = "ps_main", char const* psVer = "ps_4_0");
+
+    int InitBuf(void* ptr, UINT siz, UINT stride);          // d3dDevice()->CreateBuffer( ..., &buf); + immediateContext()->IASetVertexBuffers
 
     // ...
 };

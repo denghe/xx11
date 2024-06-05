@@ -34,9 +34,9 @@ float4 ps_main(VertexOut pIn) : SV_Target {
 }
 
 )#" };
-    if (auto r = CompileShader(src)) return r;
 
-    // todo
+    if (auto r = CompileShader(src, inputLayout, ARRAYSIZE(inputLayout))) 
+        return r;
 
     Buf vertices[] {
         { {0.0f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} },
@@ -44,12 +44,15 @@ float4 ps_main(VertexOut pIn) : SV_Target {
         { {-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }
     };
 
-    D3D11_BUFFER_DESC vbd{};
-    vbd.Usage = D3D11_USAGE_IMMUTABLE;
-    vbd.ByteWidth = sizeof(vertices);
-    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vbd.CPUAccessFlags = 0;
-    
+    if (auto r = InitBuf(vertices, sizeof(vertices), sizeof(Buf)))
+        return r;
+
+    // todo
+    //m_pd3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //m_pd3dImmediateContext->IASetInputLayout(m_pVertexLayout.Get());
+
+    //m_pd3dImmediateContext->VSSetShader(m_pVertexShader.Get(), nullptr, 0);
+    //m_pd3dImmediateContext->PSSetShader(m_pPixelShader.Get(), nullptr, 0);
 
     return 0;
 }
