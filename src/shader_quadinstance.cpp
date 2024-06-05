@@ -117,7 +117,7 @@ SPIRV_Cross_Output2 ps_main(SPIRV_Cross_Input2 stage_input)
 }
 
 )#" };
-    if (auto r = CompileShader4(src)) return r;
+    if (auto r = CompileShader(src)) return r;
     // todo
     return 0;
 }

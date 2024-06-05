@@ -19,5 +19,11 @@ struct Shader {
     ComPtr<ID3D11PixelShader> ps;
 
 protected:
-    int CompileShader4(std::string_view const& src);		// "vs_main", "vs_4_0"  "ps_main", "ps_4_0"
+    ID3D11Device1* d3dDevice(); // return gLooper.d3dDevice1.Get();
+
+    int CompileShader(std::string_view vs_src, std::string_view ps_src = {}
+        , char const* vs_main = "vs_main", char const* vs_ver = "vs_4_0"
+        , char const* ps_main = "ps_main", char const* ps_ver = "ps_4_0");
+
+    // ...
 };
