@@ -8,6 +8,8 @@
 struct Looper {
 
 protected:
+	friend Shader;
+
 	HWND hWnd{};
 	D3D_DRIVER_TYPE driverType{ D3D_DRIVER_TYPE_NULL };
 	D3D_FEATURE_LEVEL featureLevel{ D3D_FEATURE_LEVEL_11_0 };
@@ -19,20 +21,7 @@ protected:
 	ComPtr<IDXGISwapChain1> swapChain1;
 	ComPtr<ID3D11RenderTargetView> renderTargetView;
 
-	friend Shader;
 public:
-	Shader* shader{};
-	Shader_Triangles shader_Triangles;
-	Shader_QuadInstance shader_QuadInstance;
-	// ...
-
-	void ShaderSwitch(Shader& s);
-	void ShaderCommit();
-
-	void RenderBegin();	// set default shader
-	void ClearView(FLOAT const* color);
-	void RenderEnd();		// shader commit + swapChain->Present
-
 	Looper() = default;
 	Looper(Looper const&) = delete;
 	Looper& operator=(Looper const&) = delete;
@@ -40,12 +29,26 @@ public:
 
 	// need set before call Init()
 	std::wstring className, title;
-	int wndWidth{}, wndHeight{};		// not include title, border, ...
+	int wndWidth{}, wndHeight{};			// not include title, border, ...
 
 	// return 0 == success
 	int Init(HINSTANCE hInstance, int nCmdShow, bool showConsole);
 	int Run();
 	void Render();
+
+	bool stoped{};							// running flag
+
+	Shader* shader{};						// current shader
+
+	// shaders
+	Shader_Triangles shader_Triangles;
+	Shader_QuadInstance shader_QuadInstance;
+	// ...
+
+	void ShaderSwitch(Shader& s);
+	void ShaderCommit();
+
+	void ClearView(FLOAT const* color);
 
 protected:
 	inline static std::unordered_map<UINT, std::string> messageTexts;
@@ -58,4 +61,7 @@ protected:
 	int InitWindow(HINSTANCE hInstance, int nCmdShow);
 	int InitDevice();
 	int InitShaders();
+
+	void RenderBegin();					// set default shader
+	void RenderEnd();					// current shader commit + swapChain->Present
 };

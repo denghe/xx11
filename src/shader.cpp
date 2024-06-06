@@ -12,19 +12,19 @@ void Shader::ClearCounter() {
     drawCall = {};
 }
 
-XX_FORCE_INLINE ID3D11Device1* Shader::d3dDevice() {
+ID3D11Device1* Shader::d3dDevice() {
     return gLooper.d3dDevice1.Get();
 }
 
-XX_FORCE_INLINE ID3D11DeviceContext1* Shader::immediateContext() {
+ID3D11DeviceContext1* Shader::immediateContext() {
     return gLooper.immediateContext1.Get();
 }
 
-XX_FORCE_INLINE IDXGISwapChain1* Shader::swapChain() {
+IDXGISwapChain1* Shader::swapChain() {
     return gLooper.swapChain1.Get();
 }
 
-XX_FORCE_INLINE ID3D11RenderTargetView* Shader::renderTargetView() {
+ID3D11RenderTargetView* Shader::renderTargetView() {
     return gLooper.renderTargetView.Get();
 }
 

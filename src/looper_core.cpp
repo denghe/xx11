@@ -222,6 +222,7 @@ void Looper::ClearView(FLOAT const* color) {
 
 void Looper::RenderEnd() {
     ShaderCommit();
+
     auto hr = swapChain->Present(0, 0);
     if (FAILED(hr)) {
         assert(false);

@@ -9,7 +9,7 @@ int Looper::InitShaders() {
 }
 
 
-XX_FORCE_INLINE void Looper::ShaderSwitch(Shader& s) {
+void Looper::ShaderSwitch(Shader& s) {
     if (shader != &s) {
         shader->Commit();
     }
@@ -17,7 +17,7 @@ XX_FORCE_INLINE void Looper::ShaderSwitch(Shader& s) {
 }
 
 
-XX_FORCE_INLINE void Looper::ShaderCommit() {
+void Looper::ShaderCommit() {
     if (shader) {
         shader->Commit();
         shader = {};
