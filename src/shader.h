@@ -31,8 +31,10 @@ protected:
         , char const* vsMain = "vs_main", char const* vsVer = "vs_4_0"
         , char const* psMain = "ps_main", char const* psVer = "ps_4_0");
 
-    int CreateBuf(UINT len);
+    int InitBuf(void* ptr, UINT siz);   // create + memcpy  ( tested: slowly than 1 create + n fill )
 
-    void FillBuf(void* buf, UINT len);
+    int CreateBuf(UINT len);            // create only
+
+    void FillBuf(void* buf, UINT len);  // memcpy
     // ...
 };

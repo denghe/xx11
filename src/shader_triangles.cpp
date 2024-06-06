@@ -46,6 +46,7 @@ int Shader_Triangles::Commit() {
     assert(buf);
     if (len) {
 
+        //InitBuf(buf.get(), sizeof(Buf) * len);    // slowly than 1 create n fill
         FillBuf(buf.get(), sizeof(Buf) * len);
 
         auto ic = immediateContext();

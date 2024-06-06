@@ -71,6 +71,26 @@ int Shader::CompileShader(std::string_view vsSrc, D3D11_INPUT_ELEMENT_DESC const
 }
 
 
+int Shader::InitBuf(void* ptr, UINT siz) {
+    D3D11_BUFFER_DESC bd{};
+    bd.Usage = D3D11_USAGE_IMMUTABLE;
+    bd.ByteWidth = siz;
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA sd{};
+    sd.pSysMem = ptr;
+
+    auto hr = d3dDevice()->CreateBuffer(&bd, &sd, &vb);
+    if (FAILED(hr)) {
+        xx::CoutN("d3dDevice()->CreateBuffer error. hr = ", hr);
+        return __LINE__;
+    }
+
+    return 0;
+}
+
+
 int Shader::CreateBuf(UINT len) {
     D3D11_BUFFER_DESC bd{};
     bd.Usage = D3D11_USAGE_DYNAMIC;
@@ -86,6 +106,7 @@ int Shader::CreateBuf(UINT len) {
 
     return 0;
 }
+
 
 void Shader::FillBuf(void* buf, UINT len) {
     auto ctx = immediateContext();
