@@ -20,8 +20,6 @@ struct Shader_QuadInstance : Shader {
     //int32_t quadCount{};
 
     int Init() override;
-    void Begin() override;
-    void End() override;
-    void Commit();
+    int Commit() override;
     // todo: Draw?
 };

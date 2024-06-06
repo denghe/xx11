@@ -207,3 +207,23 @@ int Looper::InitDevice() {
 
     return 0;
 }
+
+
+void Looper::RenderBegin() {
+    shader = &shader_Triangles;
+}
+
+
+void Looper::ClearView(FLOAT const* color) {
+    immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);
+    //immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
+
+void Looper::RenderEnd() {
+    ShaderCommit();
+    auto hr = swapChain->Present(0, 0);
+    if (FAILED(hr)) {
+        assert(false);
+    }
+}

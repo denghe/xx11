@@ -117,31 +117,13 @@ SPIRV_Cross_Output2 ps_main(SPIRV_Cross_Input2 stage_input)
 }
 
 )#" };
-    //if (auto r = CompileShader(src, ...... )) return r;
+
     // todo
     return 0;
 }
 
-void Shader_QuadInstance::Begin() {
+
+int Shader_QuadInstance::Commit() {
     // todo
-    //immediateContext1->VSSetShader(vs.Get(), 0, 0);
-    //immediateContext1->PSSetShader(ps.Get(), 0, 0);
-    // ...
-}
-
-void Shader_QuadInstance::End() {
-    //assert(gLooper.shader == this);
-    //if (quadCount) {
-    //    Commit();
-    //}
-}
-
-void Shader_QuadInstance::Commit() {
-    // todo: send buffer + draw instanced
-
-    //drawVerts += quadCount * 6;
-    //drawCall += 1;
-
-    //lastTextureId = 0;
-    //quadCount = 0;
+    return 0;
 }

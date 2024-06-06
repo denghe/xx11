@@ -12,12 +12,20 @@ void Shader::ClearCounter() {
     drawCall = {};
 }
 
-ID3D11Device1* Shader::d3dDevice() {
+XX_FORCE_INLINE ID3D11Device1* Shader::d3dDevice() {
     return gLooper.d3dDevice1.Get();
 }
 
-ID3D11DeviceContext1* Shader::immediateContext() {
+XX_FORCE_INLINE ID3D11DeviceContext1* Shader::immediateContext() {
     return gLooper.immediateContext1.Get();
+}
+
+XX_FORCE_INLINE IDXGISwapChain1* Shader::swapChain() {
+    return gLooper.swapChain1.Get();
+}
+
+XX_FORCE_INLINE ID3D11RenderTargetView* Shader::renderTargetView() {
+    return gLooper.renderTargetView.Get();
 }
 
 int Shader::CompileShader(std::string_view vsSrc, D3D11_INPUT_ELEMENT_DESC const* layoutDescs, UINT layoutDescLen, std::string_view psSrc, char const* vsMain, char const* vsVer, char const* psMain, char const* psVer) {
@@ -59,7 +67,7 @@ int Shader::CompileShader(std::string_view vsSrc, D3D11_INPUT_ELEMENT_DESC const
     return 0;
 }
 
-int Shader::InitBuf(void* ptr, UINT siz, UINT stride) {
+int Shader::InitBuf(void* ptr, UINT siz) {
     D3D11_BUFFER_DESC bd{};
     bd.Usage = D3D11_USAGE_IMMUTABLE;
     bd.ByteWidth = siz;
@@ -69,14 +77,11 @@ int Shader::InitBuf(void* ptr, UINT siz, UINT stride) {
     D3D11_SUBRESOURCE_DATA sd{};
     sd.pSysMem = ptr;
 
-    auto hr = d3dDevice()->CreateBuffer(&bd, &sd, &buf);
+    auto hr = d3dDevice()->CreateBuffer(&bd, &sd, &vb);
     if (FAILED(hr)) {
         xx::CoutN("d3dDevice()->CreateBuffer error. hr = ", hr);
         return __LINE__;
     }
-
-    UINT offset = 0;
-    immediateContext()->IASetVertexBuffers(0, 1, buf.GetAddressOf(), &stride, &offset);
 
     return 0;
 }

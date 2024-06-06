@@ -1,8 +1,18 @@
 ﻿#include "pch.h"
 #include "looper.h"
 
+static Shader_Triangles::Buf vertices[]{
+    { {0.0f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} },
+    { {0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f} },
+    { {-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }
+};
+
 void Looper::Render() {
-    // Just clear the backbuffer
-    immediateContext->ClearRenderTargetView(renderTargetView.Get(), DirectX::Colors::MidnightBlue);
-    swapChain->Present(0, 0);
+    ClearView(DirectX::Colors::MidnightBlue);
+
+    ShaderSwitch(shader_Triangles);
+    for (auto& o : vertices) {
+        auto buf = shader_Triangles.Alloc(1);
+        *buf = o;
+    }
 }

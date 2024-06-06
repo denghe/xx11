@@ -71,7 +71,9 @@ int Looper::Run() {
     bool stoped{};
     std::thread t{ [&] {
         while (!stoped) {
+            RenderBegin();
             Render();
+            RenderEnd();
         }
     } };
 
@@ -79,7 +81,7 @@ int Looper::Run() {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-        } // else Render();
+        } // else RenderXXXXXXXXXX();
     }
 
     stoped = true;

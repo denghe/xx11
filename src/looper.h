@@ -1,13 +1,13 @@
 ﻿#pragma once
 #include "pch.h"
 #include "shader.h"
+#include "shader_triangles.h"
 #include "shader_quadinstance.h"
-#include "shader_test1.h"
+// ...
 
 struct Looper {
-protected:
-	friend Shader;
 
+protected:
 	HWND hWnd{};
 	D3D_DRIVER_TYPE driverType{ D3D_DRIVER_TYPE_NULL };
 	D3D_FEATURE_LEVEL featureLevel{ D3D_FEATURE_LEVEL_11_0 };
@@ -19,11 +19,20 @@ protected:
 	ComPtr<IDXGISwapChain1> swapChain1;
 	ComPtr<ID3D11RenderTargetView> renderTargetView;
 
-	Shader_QuadInstance shader_QuadInstance;
-	Shader_Test1 shader_Test1;
-	// ... more shader here
-
+	friend Shader;
 public:
+	Shader* shader{};
+	Shader_Triangles shader_Triangles;
+	Shader_QuadInstance shader_QuadInstance;
+	// ...
+
+	void ShaderSwitch(Shader& s);
+	void ShaderCommit();
+
+	void RenderBegin();	// set default shader
+	void ClearView(FLOAT const* color);
+	void RenderEnd();		// shader commit + swapChain->Present
+
 	Looper() = default;
 	Looper(Looper const&) = delete;
 	Looper& operator=(Looper const&) = delete;
