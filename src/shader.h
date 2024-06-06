@@ -11,9 +11,9 @@ struct Shader {
     virtual int Init() = 0;
     virtual int Commit() = 0;
 
-protected:
     inline static int drawVerts{}, drawCall{};
     static void ClearCounter();
+protected:
 
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;

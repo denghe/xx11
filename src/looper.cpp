@@ -112,7 +112,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     gLooper.wndWidth = 1280;
     gLooper.wndHeight = 720;
 
-    if (int r = gLooper.Init(hInstance, nCmdShow))
+    if (int r = gLooper.Init(hInstance, nCmdShow, true))
         return 0;
 
     return gLooper.Run();

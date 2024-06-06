@@ -31,6 +31,9 @@ public:
 	std::wstring className, title;
 	int wndWidth{}, wndHeight{};			// not include title, border, ...
 
+	// drawFps calc
+	double lastSecs{}, drawCounter{}, drawFps{};
+
 	// return 0 == success
 	int Init(HINSTANCE hInstance, int nCmdShow, bool showConsole);
 	int Run();

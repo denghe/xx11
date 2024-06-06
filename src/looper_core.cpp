@@ -205,12 +205,15 @@ int Looper::InitDevice() {
     vp.TopLeftY = 0;
     immediateContext->RSSetViewports(1, &vp);
 
+    lastSecs = xx::NowEpochSeconds();
+
     return 0;
 }
 
 
 void Looper::RenderBegin() {
     shader = &shader_Triangles;
+    Shader::ClearCounter();
 }
 
 
@@ -227,4 +230,19 @@ void Looper::RenderEnd() {
     if (FAILED(hr)) {
         assert(false);
     }
+
+    // drawFps calc
+    ++drawCounter;
+    auto nowSecs = xx::NowEpochSeconds();
+    if (auto elapsedSecs = nowSecs - lastSecs; elapsedSecs >= 1) {
+        lastSecs = nowSecs;
+
+        drawFps = drawCounter / elapsedSecs;
+        drawCounter = 0;
+
+        xx::CoutN("fps = ", (uint32_t)drawFps
+            , ", drawcall = ", Shader::drawCall
+            , ", verticles = ", Shader::drawVerts);
+    }
+
 }
