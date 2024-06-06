@@ -7,10 +7,12 @@ std::string_view BlobToStringView(ComPtr<ID3DBlob> const& b) {
     return { (char*)b->GetBufferPointer(), b->GetBufferSize() };
 }
 
+
 void Shader::ClearCounter() {
     drawVerts = {};
     drawCall = {};
 }
+
 
 ID3D11Device1* Shader::d3dDevice() {
     return gLooper.d3dDevice1.Get();
@@ -27,6 +29,7 @@ IDXGISwapChain1* Shader::swapChain() {
 ID3D11RenderTargetView* Shader::renderTargetView() {
     return gLooper.renderTargetView.Get();
 }
+
 
 int Shader::CompileShader(std::string_view vsSrc, D3D11_INPUT_ELEMENT_DESC const* layoutDescs, UINT layoutDescLen, std::string_view psSrc, char const* vsMain, char const* vsVer, char const* psMain, char const* psVer) {
     if (psSrc.empty()) {
@@ -67,21 +70,28 @@ int Shader::CompileShader(std::string_view vsSrc, D3D11_INPUT_ELEMENT_DESC const
     return 0;
 }
 
-int Shader::InitBuf(void* ptr, UINT siz) {
+
+int Shader::CreateBuf(UINT len) {
     D3D11_BUFFER_DESC bd{};
-    bd.Usage = D3D11_USAGE_IMMUTABLE;
-    bd.ByteWidth = siz;
+    bd.Usage = D3D11_USAGE_DYNAMIC;
+    bd.ByteWidth = len;
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    bd.CPUAccessFlags = 0;
+    bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-    D3D11_SUBRESOURCE_DATA sd{};
-    sd.pSysMem = ptr;
-
-    auto hr = d3dDevice()->CreateBuffer(&bd, &sd, &vb);
+    auto hr = d3dDevice()->CreateBuffer(&bd, nullptr, &vb);
     if (FAILED(hr)) {
         xx::CoutN("d3dDevice()->CreateBuffer error. hr = ", hr);
         return __LINE__;
     }
 
     return 0;
+}
+
+void Shader::FillBuf(void* buf, UINT len) {
+    auto ctx = immediateContext();
+    D3D11_MAPPED_SUBRESOURCE mres;
+    auto hr = ctx->Map(vb.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mres);
+    assert(hr == S_OK);
+    memcpy(mres.pData, buf, len);
+    ctx->Unmap(vb.Get(), 0);
 }

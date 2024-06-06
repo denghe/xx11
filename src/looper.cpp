@@ -64,10 +64,10 @@ LRESULT CALLBACK Looper::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-
 int Looper::Run() {
     MSG msg{};
 
+#if 0
     bool stoped{};
     std::thread t{ [&] {
         while (!stoped) {
@@ -81,11 +81,23 @@ int Looper::Run() {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-        } // else RenderXXXXXXXXXX();
+        }
     }
 
     stoped = true;
     t.join();
+#else
+    while (WM_QUIT != msg.message) {
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        } else {
+            RenderBegin();
+            Render();
+            RenderEnd();
+        }
+    }
+#endif
 
     return (int)msg.wParam;
 }

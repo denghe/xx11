@@ -31,7 +31,8 @@ protected:
         , char const* vsMain = "vs_main", char const* vsVer = "vs_4_0"
         , char const* psMain = "ps_main", char const* psVer = "ps_4_0");
 
-    int InitBuf(void* ptr, UINT siz);                       // d3dDevice()->CreateBuffer( ..., &buf)
+    int CreateBuf(UINT len);
 
+    void FillBuf(void* buf, UINT len);
     // ...
 };

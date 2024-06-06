@@ -34,6 +34,9 @@ float4 ps_main(VertexOut pIn) : SV_Target {
 
     buf = std::make_unique<Buf[]>(cap);
 
+    if (auto r = CreateBuf(sizeof(Buf) * cap))
+        return r;
+
     return 0;
 }
 
@@ -42,8 +45,8 @@ int Shader_Triangles::Commit() {
     assert(gLooper.shader == this);
     assert(buf);
     if (len) {
-        if (auto r = InitBuf(buf.get(),  sizeof(Buf) * len))
-            return r;
+
+        FillBuf(buf.get(), sizeof(Buf) * len);
 
         auto ic = immediateContext();
 
@@ -56,7 +59,7 @@ int Shader_Triangles::Commit() {
         ic->VSSetShader(vs.Get(), nullptr, 0);
         ic->PSSetShader(ps.Get(), nullptr, 0);
 
-        ic->Draw(3, 0);
+        ic->Draw(len, 0);
 
         len = {};
         drawVerts += len * 3;
@@ -70,7 +73,12 @@ Shader_Triangles::Buf* Shader_Triangles::Alloc(int32_t num) {
     assert(gLooper.shader == this);
     assert(len <= cap);
     if (len + num > cap/* || (lastTextureId && lastTextureId != texId)*/) {
-        Commit();
+        FillBuf(buf.get(), sizeof(Buf) * len);
+        immediateContext()->Draw(len, 0);
+
+        len = {};
+        drawVerts += len * 3;
+        drawCall += 1;
     }
     //lastTextureId = texId;
     auto r = &buf[len];

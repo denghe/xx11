@@ -2,9 +2,9 @@
 #include "looper.h"
 
 static constexpr Shader_Triangles::Buf vertices[]{
-    { {0.0f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f, 1.0f} },
-    { {0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f, 1.0f} },
-    { {-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f, 1.0f} }
+    { {0.0f, 0.1f, 0.1f}, {0.0f, 1.0f, 0.0f, 1.0f} },
+    { {0.1f, -0.1f, 0.1f}, {0.0f, 0.0f, 1.0f, 1.0f} },
+    { {-0.1f, -0.1f, 0.1f}, {1.0f, 0.0f, 0.0f, 1.0f} }
 };
 
 void Looper::Render() {
