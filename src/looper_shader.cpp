@@ -2,8 +2,10 @@
 #include "looper.h"
 
 int Looper::InitShaders() {
-    if (int r = shader_QuadInstance.Init()) return r;
     if (int r = shader_Triangles.Init()) return r;
+    if (int r = shader_IndexTriangles.Init()) return r;
+    // ...
+    if (int r = shader_QuadInstance.Init()) return r;
     // ...
     return 0;
 }

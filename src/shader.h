@@ -18,7 +18,7 @@ protected:
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
     ComPtr<ID3D11InputLayout> vil;
-    ComPtr<ID3D11Buffer> vb;
+    ComPtr<ID3D11Buffer> vb, ib, cb;
 
     // return gLooper.*.Get();
     ID3D11Device1* d3dDevice();
@@ -31,10 +31,5 @@ protected:
         , char const* vsMain = "vs_main", char const* vsVer = "vs_4_0"
         , char const* psMain = "ps_main", char const* psVer = "ps_4_0");
 
-    int InitBuf(void* ptr, UINT siz);   // create + memcpy  ( tested: slowly than 1 create + n fill )
-
-    int CreateBuf(UINT len);            // create only
-
-    void FillBuf(void* buf, UINT len);  // memcpy
     // ...
 };

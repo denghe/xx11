@@ -193,7 +193,28 @@ int Looper::InitDevice() {
     if (FAILED(hr))
         return __LINE__;
 
-    immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);
+    // Create a depth stencil view
+    D3D11_TEXTURE2D_DESC td{};
+    td.Width = width;
+    td.Height = height;
+    td.MipLevels = 1;
+    td.ArraySize = 1;
+    td.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    td.SampleDesc.Count = 1;
+    td.SampleDesc.Quality = 0;
+    td.Usage = D3D11_USAGE_DEFAULT;
+    td.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    td.CPUAccessFlags = 0;
+    td.MiscFlags = 0;
+    hr = d3dDevice->CreateTexture2D(&td, nullptr, &depthStencilBuffer);
+    if (FAILED(hr))
+        return __LINE__;
+
+    hr = d3dDevice->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, &depthStencilView);
+    if (FAILED(hr))
+        return __LINE__;
+
+    immediateContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 
     // Setup the viewport
     D3D11_VIEWPORT vp;
@@ -219,7 +240,7 @@ void Looper::RenderBegin() {
 
 void Looper::ClearView(FLOAT const* color) {
     immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);
-    //immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 

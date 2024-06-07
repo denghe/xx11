@@ -29,7 +29,7 @@ float4 ps_main(VertexOut pIn) : SV_Target {
 
 )#" };
 
-    if (auto r = CompileShader(src, layout, ARRAYSIZE(layout))) 
+    if (auto r = CompileShader(src, layout, std::size(layout))) 
         return r;
 
     buf = std::make_unique<Buf[]>(cap);
@@ -41,11 +41,56 @@ float4 ps_main(VertexOut pIn) : SV_Target {
 }
 
 
+int Shader_Triangles::InitBuf(void* ptr, UINT siz) {
+    D3D11_BUFFER_DESC bd{};
+    bd.Usage = D3D11_USAGE_IMMUTABLE;
+    bd.ByteWidth = siz;
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA sd{};
+    sd.pSysMem = ptr;
+
+    auto hr = d3dDevice()->CreateBuffer(&bd, &sd, &vb);
+    if (FAILED(hr)) {
+        xx::CoutN("d3dDevice()->CreateBuffer error. hr = ", hr);
+        return __LINE__;
+    }
+
+    return 0;
+}
+
+
+int Shader_Triangles::CreateBuf(UINT len) {
+    D3D11_BUFFER_DESC bd{};
+    bd.Usage = D3D11_USAGE_DYNAMIC;
+    bd.ByteWidth = len;
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+    auto hr = d3dDevice()->CreateBuffer(&bd, nullptr, &vb);
+    if (FAILED(hr)) {
+        xx::CoutN("d3dDevice()->CreateBuffer error. hr = ", hr);
+        return __LINE__;
+    }
+
+    return 0;
+}
+
+
+void Shader_Triangles::FillBuf(void* buf, UINT len) {
+    auto ctx = immediateContext();
+    D3D11_MAPPED_SUBRESOURCE mres;
+    auto hr = ctx->Map(vb.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mres);
+    assert(hr == S_OK);
+    memcpy(mres.pData, buf, len);
+    ctx->Unmap(vb.Get(), 0);
+}
+
+
 int Shader_Triangles::Commit() {
     assert(gLooper.shader == this);
-    assert(buf);
     if (len) {
-
         //InitBuf(buf.get(), sizeof(Buf) * len);    // slowly than 1 create n fill
         FillBuf(buf.get(), sizeof(Buf) * len);
 
@@ -62,9 +107,9 @@ int Shader_Triangles::Commit() {
 
         ic->Draw(len, 0);
 
-        len = {};
-        drawVerts += len * 3;
+        drawVerts += len;
         drawCall += 1;
+        len = {};
     }
     return 0;
 }
@@ -74,12 +119,7 @@ Shader_Triangles::Buf* Shader_Triangles::Alloc(int32_t num) {
     assert(gLooper.shader == this);
     assert(len <= cap);
     if (len + num > cap/* || (lastTextureId && lastTextureId != texId)*/) {
-        FillBuf(buf.get(), sizeof(Buf) * len);
-        immediateContext()->Draw(len, 0);
-
-        len = {};
-        drawVerts += len * 3;
-        drawCall += 1;
+        Commit();
     }
     //lastTextureId = texId;
     auto r = &buf[len];

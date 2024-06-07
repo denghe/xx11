@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "shader.h"
 #include "shader_triangles.h"
+#include "shader_indextriangles.h"
+// ...
 #include "shader_quadinstance.h"
 // ...
 
@@ -20,6 +22,8 @@ protected:
 	ComPtr<IDXGISwapChain> swapChain;
 	ComPtr<IDXGISwapChain1> swapChain1;
 	ComPtr<ID3D11RenderTargetView> renderTargetView;
+	ComPtr<ID3D11Texture2D> depthStencilBuffer;
+	ComPtr<ID3D11DepthStencilView> depthStencilView;
 
 public:
 	Looper() = default;
@@ -45,6 +49,8 @@ public:
 
 	// shaders
 	Shader_Triangles shader_Triangles;
+	Shader_IndexTriangles shader_IndexTriangles;
+	// ...
 	Shader_QuadInstance shader_QuadInstance;
 	// ...
 
