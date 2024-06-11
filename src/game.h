@@ -6,7 +6,7 @@ struct Game : Looper<Game> {
     void Render();
 
     // simple trangle
-    static constexpr Shader_Triangles::Buf vertices1[]{
+    static constexpr Shader_Triangles::Vert vertices1[]{
         { {0.0f, 0.1f, 0.1f}, {0.0f, 1.0f, 0.0f, 1.0f} },
         { {0.1f, -0.1f, 0.1f}, {0.0f, 0.0f, 1.0f, 1.0f} },
         { {-0.1f, -0.1f, 0.1f}, {1.0f, 0.0f, 0.0f, 1.0f} }
