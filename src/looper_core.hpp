@@ -1,9 +1,7 @@
-﻿#include "pch.h"
-#include "looper.h"
+﻿#pragma once
 
-Looper gLooper;
-
-int Looper::InitWindow(HINSTANCE hInstance, int nCmdShow) {
+template<typename Derived>
+int Looper<Derived>::InitWindow(HINSTANCE hInstance, int nCmdShow) {
     if (className.empty())
         return __LINE__;
 
@@ -47,7 +45,8 @@ int Looper::InitWindow(HINSTANCE hInstance, int nCmdShow) {
 }
 
 
-void Looper::ShowConsole() {
+template<typename Derived>
+void Looper<Derived>::ShowConsole() {
     ::AllocConsole();
     FILE* tmp{};
     freopen_s(&tmp, "CONIN$", "r", stdin);
@@ -69,7 +68,8 @@ void Looper::ShowConsole() {
 }
 
 
-int Looper::InitDevice() {
+template<typename Derived>
+int Looper<Derived>::InitDevice() {
     HRESULT hr{ S_OK };
 
     RECT rc;
@@ -226,25 +226,26 @@ int Looper::InitDevice() {
     vp.TopLeftY = 0;
     immediateContext->RSSetViewports(1, &vp);
 
-    lastSecs = xx::NowEpochSeconds();
-
     return 0;
 }
 
 
-void Looper::RenderBegin() {
+template<typename Derived>
+void Looper<Derived>::RenderBegin() {
     shader = &shader_Triangles;
     Shader::ClearCounter();
 }
 
 
-void Looper::ClearView(FLOAT const* color) {
+template<typename Derived>
+void Looper<Derived>::ClearView(FLOAT const* color) {
     immediateContext->ClearRenderTargetView(renderTargetView.Get(), color);
     immediateContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 
-void Looper::RenderEnd() {
+template<typename Derived>
+void Looper<Derived>::RenderEnd() {
     ShaderCommit();
 
     auto hr = swapChain->Present(0, 0);
@@ -256,6 +257,7 @@ void Looper::RenderEnd() {
     ++drawCounter;
     auto nowSecs = xx::NowEpochSeconds();
     if (auto elapsedSecs = nowSecs - lastSecs; elapsedSecs >= 1) {
+        deltaSecs = nowSecs - lastSecs;
         lastSecs = nowSecs;
 
         drawFps = drawCounter / elapsedSecs;

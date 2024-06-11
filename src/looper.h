@@ -7,6 +7,7 @@
 #include "shader_quadinstance.h"
 // ...
 
+template<typename Derived>
 struct Looper {
 
 protected:
@@ -36,12 +37,8 @@ public:
 	int wndWidth{}, wndHeight{};			// not include title, border, ...
 
 	// drawFps calc
-	double lastSecs{}, drawCounter{}, drawFps{};
+	double lastSecs{}, deltaSecs{}, drawCounter{}, drawFps{};
 
-	// return 0 == success
-	int Init(HINSTANCE hInstance, int nCmdShow, bool showConsole);
-	int Run();
-	void Render();
 
 	bool stoped{};							// running flag
 
@@ -59,6 +56,11 @@ public:
 
 	void ClearView(FLOAT const* color);
 
+	// return 0 == success
+	int Init(HINSTANCE hInstance, int nCmdShow, bool showConsole);
+	int Run();
+	//void Render(); impl by Derived ( need call ClearView )
+
 protected:
 	inline static std::unordered_map<UINT, std::string> messageTexts;
 	static void InitMessageTexts();
@@ -74,3 +76,8 @@ protected:
 	void RenderBegin();					// set default shader
 	void RenderEnd();					// current shader commit + swapChain->Present
 };
+
+#include "looper_base.hpp"
+#include "looper_core.hpp"
+#include "looper_message.hpp"
+#include "looper_shader.hpp"

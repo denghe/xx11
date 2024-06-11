@@ -1,12 +1,11 @@
-﻿#include "pch.h"
-#include "looper.h"
+﻿#pragma once
 
 /*
 https://wiki.winehq.org/List_Of_Windows_Messages
 */
 
-
-void Looper::DumpMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+template<typename Derived>
+void Looper<Derived>::DumpMessage(UINT message, WPARAM wParam, LPARAM lParam) {
     std::string s;
     if (auto iter = messageTexts.find(message); iter != messageTexts.end()) {
         xx::Append(s, "message = ", iter->second, " wParam = ", wParam, " lParam = ", lParam, '\n');
@@ -22,7 +21,8 @@ void Looper::DumpMessage(UINT message, WPARAM wParam, LPARAM lParam) {
 }
 
 
-void Looper::InitMessageTexts() {
+template<typename Derived>
+void Looper<Derived>::InitMessageTexts() {
     assert(messageTexts.empty());
 #define REGISTER_MESSAGE_TEXT(msg) messageTexts[msg] = #msg;
     REGISTER_MESSAGE_TEXT(WM_NULL);

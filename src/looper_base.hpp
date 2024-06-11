@@ -1,14 +1,7 @@
-﻿#include "pch.h"
-#include "looper.h"
+﻿#pragma once
 
-
-int Looper::Init(HINSTANCE hInstance, int nCmdShow, bool showConsole =
-#ifndef NDEBUG
-    true
-#else
-    false
-#endif
-) {
+template<typename Derived>
+int Looper<Derived>::Init(HINSTANCE hInstance, int nCmdShow, bool showConsole) {
     if (showConsole) {
         ShowConsole();
     }
@@ -26,17 +19,23 @@ int Looper::Init(HINSTANCE hInstance, int nCmdShow, bool showConsole =
     // ...
     InitShaders();
     // ...
+
+    lastSecs = xx::NowEpochSeconds();
+    deltaSecs = 0.00001;
+
     return 0;
 }
 
 
-Looper::~Looper() {
+template<typename Derived>
+Looper<Derived>::~Looper() {
     // todo: clear others contain devices
     if (immediateContext) immediateContext->ClearState();
 }
 
 
-LRESULT CALLBACK Looper::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+template<typename Derived>
+LRESULT CALLBACK Looper<Derived>::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     PAINTSTRUCT ps;
     HDC hdc;
 
@@ -64,7 +63,9 @@ LRESULT CALLBACK Looper::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-int Looper::Run() {
+
+template<typename Derived>
+int Looper<Derived>::Run() {
     MSG msg{};
 
 #if 0
@@ -72,7 +73,7 @@ int Looper::Run() {
     std::thread t{ [&] {
         while (!stoped) {
             RenderBegin();
-            Render();
+            ((Derived*)this)->Render();
             RenderEnd();
         }
     } };
@@ -93,27 +94,11 @@ int Looper::Run() {
             DispatchMessage(&msg);
         } else {
             RenderBegin();
-            Render();
+            ((Derived*)this)->Render();
             RenderEnd();
         }
     }
 #endif
 
     return (int)msg.wParam;
-}
-
-
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
-
-    gLooper.className = L"xx2d_dx11_engine_main_window";
-    gLooper.title = L"xx2d engine ( dx11 )";
-    gLooper.wndWidth = 1280;
-    gLooper.wndHeight = 720;
-
-    if (int r = gLooper.Init(hInstance, nCmdShow, true))
-        return 0;
-
-    return gLooper.Run();
 }

@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "looper.h"
+#include "game.h"
 #include "shader_indextriangles.h"
 
 int Shader_IndexTriangles::Init() {
@@ -56,6 +56,8 @@ float4 ps_main(VertexOut pIn) : SV_Target {
         return __LINE__;
     }
 
+    // todo: cb   ByteWidth align == 16
+
     return 0;
 }
 
@@ -66,19 +68,23 @@ int Shader_IndexTriangles::Commit() {
         assert(ilen);
         auto ic = immediateContext();
 
-        D3D11_MAPPED_SUBRESOURCE mv, mi;
-        auto hr = ic->Map(vb.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mv);
-        assert(hr == S_OK);
-        hr = ic->Map(ib.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mi);
-        assert(hr == S_OK);
-        memcpy(mv.pData, verts.get(), vlen * sizeof(Vert));
-        memcpy(mv.pData, idxs.get(), ilen * sizeof(UINT));
-        ic->Unmap(ib.Get(), 0);
-        ic->Unmap(vb.Get(), 0);
+        {
+            D3D11_MAPPED_SUBRESOURCE mv, mi;
+            auto hr = ic->Map(vb.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mv);
+            assert(hr == S_OK);
+            hr = ic->Map(ib.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mi);
+            assert(hr == S_OK);
+            memcpy(mv.pData, verts.get(), vlen * sizeof(Vert));
+            memcpy(mv.pData, idxs.get(), ilen * sizeof(UINT));
+            ic->Unmap(ib.Get(), 0);
+            ic->Unmap(vb.Get(), 0);
+        }
 
-        UINT offset{}, stride{ sizeof(Vert) };
-        ic->IASetVertexBuffers(0, 1, vb.GetAddressOf(), &stride, &offset);
-        ic->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
+        {
+            UINT offset{}, stride{ sizeof(Vert) };
+            ic->IASetVertexBuffers(0, 1, vb.GetAddressOf(), &stride, &offset);
+            ic->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
+        }
 
         ic->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         ic->IASetInputLayout(vil.Get());

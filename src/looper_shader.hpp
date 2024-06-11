@@ -1,7 +1,7 @@
-﻿#include "pch.h"
-#include "looper.h"
+﻿#pragma once
 
-int Looper::InitShaders() {
+template<typename Derived>
+int Looper<Derived>::InitShaders() {
     if (int r = shader_Triangles.Init()) return r;
     if (int r = shader_IndexTriangles.Init()) return r;
     // ...
@@ -11,7 +11,8 @@ int Looper::InitShaders() {
 }
 
 
-void Looper::ShaderSwitch(Shader& s) {
+template<typename Derived>
+void Looper<Derived>::ShaderSwitch(Shader& s) {
     if (shader != &s) {
         shader->Commit();
     }
@@ -19,7 +20,8 @@ void Looper::ShaderSwitch(Shader& s) {
 }
 
 
-void Looper::ShaderCommit() {
+template<typename Derived>
+void Looper<Derived>::ShaderCommit() {
     if (shader) {
         shader->Commit();
         shader = {};

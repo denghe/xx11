@@ -18,6 +18,8 @@ struct Shader_IndexTriangles : Shader {
     std::unique_ptr<UINT[]> idxs;
     int32_t vlen{}, ilen{};
 
+    DirectX::XMMATRIX world, view, proj;
+
     int Init() override;
     int Commit() override;
     std::pair<Vert*, UINT*> Alloc(int32_t vnum, int32_t inum);

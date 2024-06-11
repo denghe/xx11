@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "looper.h"
+#include "game.h"
 #include "shader_triangles.h"
 
 int Shader_Triangles::Init() {
