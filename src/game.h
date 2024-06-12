@@ -54,6 +54,7 @@ struct Game : Looper<Game> {
         3, 7, 4
     };
 
+    xx::Ref<Shader_IndexTriangles::ConstantBuffer> cb;
     xx::Task<> Render2Logic = Render2Logic_();
     xx::Task<> Render2Logic_();
     void Render2(); // draw rotate 3d cube

@@ -76,8 +76,9 @@ inline int Shader_IndexTriangles::Commit() {
     assert(gLooper.shader == this);
     if (vlen) {
         assert(ilen);
-        auto ic = immediateContext();
+        assert(constantBuffer);
 
+        auto ic = immediateContext();
         {
             D3D11_MAPPED_SUBRESOURCE mv, mi, mc;
             auto hr = ic->Map(vb.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mv);
@@ -88,7 +89,7 @@ inline int Shader_IndexTriangles::Commit() {
             assert(hr == S_OK);
             memcpy(mv.pData, verts.get(), vlen * sizeof(Vert));
             memcpy(mi.pData, idxs.get(), ilen * sizeof(UINT));
-            memcpy(mc.pData, &constantBuffer, sizeof(ConstantBuffer));
+            memcpy(mc.pData, constantBuffer.pointer, sizeof(ConstantBuffer));
             ic->Unmap(cb.Get(), 0);
             ic->Unmap(ib.Get(), 0);
             ic->Unmap(vb.Get(), 0);
@@ -117,15 +118,17 @@ inline int Shader_IndexTriangles::Commit() {
 }
 
 
-inline std::pair<Shader_IndexTriangles::Vert*, UINT*> Shader_IndexTriangles::Alloc(int32_t vnum, int32_t inum) {
+inline std::pair<Shader_IndexTriangles::Vert*, UINT*> Shader_IndexTriangles::Alloc(xx::Ref<ConstantBuffer> constantBuffer_, int32_t vnum, int32_t inum) {
     assert(gLooper.shader == this);
+    assert(constantBuffer_);
     assert(vnum <= vcap);
     assert(inum <= icap);
     assert(vlen <= vcap);
     assert(ilen <= icap);
-    if (vlen + vnum > vcap || ilen + inum > icap) {
+    if (vlen + vnum > vcap || ilen + inum > icap || (constantBuffer && constantBuffer != constantBuffer_)) {
         Commit();
     }
+    constantBuffer = std::move(constantBuffer_);
     std::pair<Shader_IndexTriangles::Vert*, UINT*> r{ &verts[vlen], &idxs[ilen] };
     vlen += vnum;
     ilen += inum;

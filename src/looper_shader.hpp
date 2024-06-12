@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#include "looper.h"
+#pragma once
 
 template<typename Derived>
 int Looper<Derived>::InitShaders() {

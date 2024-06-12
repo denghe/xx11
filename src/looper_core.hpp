@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#include "looper.h"
+#pragma once
 
 template<typename Derived>
 int Looper<Derived>::InitWindow(HINSTANCE hInstance, int nCmdShow) {
@@ -252,20 +253,33 @@ void Looper<Derived>::RenderEnd() {
     if (FAILED(hr)) {
         assert(false);
     }
+}
 
-    // drawFps calc
-    ++drawCounter;
-    auto nowSecs = xx::NowEpochSeconds();
-    if (auto elapsedSecs = nowSecs - lastSecs; elapsedSecs >= 1) {
-        deltaSecs = nowSecs - lastSecs;
-        lastSecs = nowSecs;
 
-        drawFps = drawCounter / elapsedSecs;
-        drawCounter = 0;
+template<typename Derived>
+void Looper<Derived>::BeforeRun() {
+    deltaSecs = 0.000001;
+    nowSecs = xx::NowEpochSeconds() - deltaSecs;
+}
 
-        xx::CoutN("fps = ", (uint32_t)drawFps
+
+template<typename Derived>
+void Looper<Derived>::FrameBegin() {
+    auto tmp = xx::NowEpochSeconds();
+    deltaSecs = tmp - nowSecs;
+    nowSecs = tmp;
+}
+
+
+template<typename Derived>
+void Looper<Derived>::FrameEnd() {
+    ++fpsCounter;
+    fpsSecs += deltaSecs;
+    if (fpsSecs >= 1.) {
+        fpsSecs -= 1.;
+        xx::CoutN("fps = ", fpsCounter
             , ", drawcall = ", Shader::drawCall
             , ", verticles = ", Shader::drawVerts);
+        fpsCounter = 0;
     }
-
 }

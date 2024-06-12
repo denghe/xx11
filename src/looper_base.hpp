@@ -9,19 +9,16 @@ int Looper<Derived>::Init(HINSTANCE hInstance, int nCmdShow, bool showConsole) {
         return __LINE__;
     if (wndHeight <= 0)
         return __LINE__;
-    // ...
+
     InitMessageTexts();
-    // ...
+
     if (int r = InitWindow(hInstance, nCmdShow))
         return r;
+
     if (int r = InitDevice())
         return r;
-    // ...
-    InitShaders();
-    // ...
 
-    lastSecs = xx::NowEpochSeconds();
-    deltaSecs = 0.00001;
+    InitShaders();
 
     return 0;
 }
@@ -68,13 +65,17 @@ template<typename Derived>
 int Looper<Derived>::Run() {
     MSG msg{};
 
+    BeforeRun();
+
 #if 1
     bool stoped{};
     std::thread t{ [&] {
         while (!stoped) {
+            FrameBegin();
             RenderBegin();
             ((Derived*)this)->Render();
             RenderEnd();
+            FrameEnd();
         }
     } };
 
@@ -93,9 +94,11 @@ int Looper<Derived>::Run() {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         } else {
+            FrameBegin();
             RenderBegin();
             ((Derived*)this)->Render();
             RenderEnd();
+            FrameEnd();
         }
     }
 #endif

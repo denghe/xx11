@@ -22,9 +22,9 @@ struct Shader_IndexTriangles : Shader {
     std::unique_ptr<Vert[]> verts;
     std::unique_ptr<UINT[]> idxs;
     int32_t vlen{}, ilen{};
-    ConstantBuffer constantBuffer;  // need fill
+    xx::Ref<ConstantBuffer> constantBuffer;
 
     int Init() override;
     int Commit() override;
-    std::pair<Vert*, UINT*> Alloc(int32_t vnum, int32_t inum);
+    std::pair<Vert*, UINT*> Alloc(xx::Ref<ConstantBuffer> constantBuffer_, int32_t vnum, int32_t inum);
 };

@@ -34,14 +34,15 @@ public:
 
 	// need set before call Init()
 	std::wstring className, title;
-	int wndWidth{}, wndHeight{};			// not include title, border, ...
+	int wndWidth{}, wndHeight{};					// not include title, border, ...
+	
+	double nowSecs{}, deltaSecs{};					// frame time env
+	double fpsSecs{};
+	int32_t fpsCounter{};
 
-	// drawFps calc
-	double lastSecs{}, deltaSecs{}, drawCounter{}, drawFps{};
+	bool stoped{};									// running flag
 
-	bool stoped{};							// running flag
-
-	Shader* shader{};						// current shader
+	Shader* shader{};								// current shader
 
 	// shaders
 	Shader_Triangles shader_Triangles;
@@ -72,6 +73,9 @@ protected:
 	int InitDevice();
 	int InitShaders();
 
+	void BeforeRun();
+	void FrameBegin();
 	void RenderBegin();					// set default shader
 	void RenderEnd();					// current shader commit + swapChain->Present
+	void FrameEnd();
 };
