@@ -113,6 +113,7 @@ inline int Shader_IndexTriangles::Commit() {
         drawVerts += ilen;
         drawCall += 1;
         vlen = ilen = {};
+        constantBuffer.Reset();
     }
     return 0;
 }
