@@ -39,7 +39,6 @@ public:
 	// drawFps calc
 	double lastSecs{}, deltaSecs{}, drawCounter{}, drawFps{};
 
-
 	bool stoped{};							// running flag
 
 	Shader* shader{};						// current shader

@@ -54,8 +54,8 @@ struct Game : Looper<Game> {
         3, 7, 4
     };
 
-    static constexpr double frameDelaySecs{ 1. / 60. };
-    double timePool{};
+    xx::Task<> Render2Logic = Render2Logic_();
+    xx::Task<> Render2Logic_();
     void Render2(); // draw rotate 3d cube
 };
 

@@ -68,7 +68,7 @@ template<typename Derived>
 int Looper<Derived>::Run() {
     MSG msg{};
 
-#if 0
+#if 1
     bool stoped{};
     std::thread t{ [&] {
         while (!stoped) {

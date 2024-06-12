@@ -4,8 +4,14 @@ inline int Shader_IndexTriangles::Init() {
 
     std::string_view src{ R"#(
 
+cbuffer ConstantBuffer : register(b0) {
+    matrix g_World;
+    matrix g_View;
+    matrix g_Proj;
+}
+
 struct VertexIn {
-    float3 pos : POSITION;
+    float3 posL : POSITION;
     float4 color : COLOR;
 };
 
@@ -16,13 +22,15 @@ struct VertexOut {
 
 VertexOut vs_main(VertexIn vIn) {
     VertexOut vOut;
-    vOut.posH = float4(vIn.pos, 1.0f);
+    vOut.posH = mul(float4(vIn.posL, 1.0f), g_World);
+    vOut.posH = mul(vOut.posH, g_View);
+    vOut.posH = mul(vOut.posH, g_Proj);
     vOut.color = vIn.color;
     return vOut;
 }
 
 float4 ps_main(VertexOut pIn) : SV_Target {
-    return pIn.color;   
+    return pIn.color;
 }
 
 )#" };
@@ -38,7 +46,6 @@ float4 ps_main(VertexOut pIn) : SV_Target {
     bd.ByteWidth = vcap * sizeof(Vert);
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
     auto hr = d3dDevice()->CreateBuffer(&bd, nullptr, &vb);
     if (FAILED(hr)) {
         xx::CoutN("d3dDevice()->CreateBuffer( vb ) error. hr = ", hr);
@@ -47,14 +54,19 @@ float4 ps_main(VertexOut pIn) : SV_Target {
 
     bd.ByteWidth = icap * sizeof(UINT);
     bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
     hr = d3dDevice()->CreateBuffer(&bd, nullptr, &ib);
     if (FAILED(hr)) {
         xx::CoutN("d3dDevice()->CreateBuffer( ib ) error. hr = ", hr);
         return __LINE__;
     }
 
-    // todo: cb   ByteWidth align == 16
+    bd.ByteWidth = sizeof(ConstantBuffer);
+    bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    hr = d3dDevice()->CreateBuffer(&bd, nullptr, &cb);
+    if (FAILED(hr)) {
+        xx::CoutN("d3dDevice()->CreateBuffer( cb ) error. hr = ", hr);
+        return __LINE__;
+    }
 
     return 0;
 }
@@ -67,22 +79,27 @@ inline int Shader_IndexTriangles::Commit() {
         auto ic = immediateContext();
 
         {
-            D3D11_MAPPED_SUBRESOURCE mv, mi;
+            D3D11_MAPPED_SUBRESOURCE mv, mi, mc;
             auto hr = ic->Map(vb.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mv);
             assert(hr == S_OK);
             hr = ic->Map(ib.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mi);
             assert(hr == S_OK);
+            hr = ic->Map(cb.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mc);
+            assert(hr == S_OK);
             memcpy(mv.pData, verts.get(), vlen * sizeof(Vert));
-            memcpy(mv.pData, idxs.get(), ilen * sizeof(UINT));
+            memcpy(mi.pData, idxs.get(), ilen * sizeof(UINT));
+            memcpy(mc.pData, &constantBuffer, sizeof(ConstantBuffer));
+            ic->Unmap(cb.Get(), 0);
             ic->Unmap(ib.Get(), 0);
             ic->Unmap(vb.Get(), 0);
         }
 
+        ic->VSSetConstantBuffers(0, 1, cb.GetAddressOf());
         {
             UINT offset{}, stride{ sizeof(Vert) };
             ic->IASetVertexBuffers(0, 1, vb.GetAddressOf(), &stride, &offset);
-            ic->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
         }
+        ic->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         ic->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         ic->IASetInputLayout(vil.Get());

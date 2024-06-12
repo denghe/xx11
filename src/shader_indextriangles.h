@@ -12,13 +12,17 @@ struct Shader_IndexTriangles : Shader {
         DirectX::XMFLOAT3 pos;
         DirectX::XMFLOAT4 color;
     };
+    struct ConstantBuffer {
+        DirectX::XMMATRIX world;
+        DirectX::XMMATRIX view;
+        DirectX::XMMATRIX proj;
+    };
 
     static constexpr UINT vcap{ 100000 }, icap{ vcap * 5 };
     std::unique_ptr<Vert[]> verts;
     std::unique_ptr<UINT[]> idxs;
     int32_t vlen{}, ilen{};
-
-    DirectX::XMMATRIX world, view, proj;
+    ConstantBuffer constantBuffer;  // need fill
 
     int Init() override;
     int Commit() override;
