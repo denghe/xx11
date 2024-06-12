@@ -35,7 +35,6 @@ xx::Task<> Game::Render2Logic_() {
     }
 }
 
-
 void Game::Render2() {
     Render2Logic();
 
