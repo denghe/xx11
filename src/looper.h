@@ -76,8 +76,3 @@ protected:
 	void RenderBegin();					// set default shader
 	void RenderEnd();					// current shader commit + swapChain->Present
 };
-
-#include "looper_base.hpp"
-#include "looper_core.hpp"
-#include "looper_message.hpp"
-#include "looper_shader.hpp"

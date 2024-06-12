@@ -1,37 +1,38 @@
-﻿#include "pch.h"
-#include "game.h"
-#include "shader.h"
+﻿#pragma once
 
-std::string_view BlobToStringView(ComPtr<ID3DBlob> const& b) {
+inline std::string_view BlobToStringView(ComPtr<ID3DBlob> const& b) {
     if (!b) return {};
     return { (char*)b->GetBufferPointer(), b->GetBufferSize() };
 }
 
 
-void Shader::ClearCounter() {
+inline void Shader::ClearCounter() {
     drawVerts = {};
     drawCall = {};
 }
 
 
-ID3D11Device1* Shader::d3dDevice() {
+inline ID3D11Device1* Shader::d3dDevice() {
     return gLooper.d3dDevice1.Get();
 }
 
-ID3D11DeviceContext1* Shader::immediateContext() {
+
+inline ID3D11DeviceContext1* Shader::immediateContext() {
     return gLooper.immediateContext1.Get();
 }
 
-IDXGISwapChain1* Shader::swapChain() {
+
+inline IDXGISwapChain1* Shader::swapChain() {
     return gLooper.swapChain1.Get();
 }
 
-ID3D11RenderTargetView* Shader::renderTargetView() {
+
+inline ID3D11RenderTargetView* Shader::renderTargetView() {
     return gLooper.renderTargetView.Get();
 }
 
 
-int Shader::CompileShader(std::string_view vsSrc, D3D11_INPUT_ELEMENT_DESC const* layoutDescs, UINT layoutDescLen, std::string_view psSrc, char const* vsMain, char const* vsVer, char const* psMain, char const* psVer) {
+inline int Shader::CompileShader(std::string_view vsSrc, D3D11_INPUT_ELEMENT_DESC const* layoutDescs, UINT layoutDescLen, std::string_view psSrc, char const* vsMain, char const* vsVer, char const* psMain, char const* psVer) {
     if (psSrc.empty()) {
         psSrc = vsSrc;
     }

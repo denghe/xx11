@@ -1,8 +1,6 @@
-﻿#include "pch.h"
-#include "looper.h"
-#include "shader_quadinstance.h"
+﻿#pragma once
 
-int Shader_QuadInstance::Init() {
+inline int Shader_QuadInstance::Init() {
 
     // todo: optimize
 
@@ -123,7 +121,7 @@ SPIRV_Cross_Output2 ps_main(SPIRV_Cross_Input2 stage_input)
 }
 
 
-int Shader_QuadInstance::Commit() {
+inline int Shader_QuadInstance::Commit() {
     // todo
     return 0;
 }

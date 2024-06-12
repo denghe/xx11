@@ -58,3 +58,5 @@ struct Game : Looper<Game> {
     double timePool{};
     void Render2(); // draw rotate 3d cube
 };
+
+#include "looper.hpp"
