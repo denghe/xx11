@@ -3,8 +3,9 @@
 
 void Game::Render() {
     ClearView(DirectX::Colors::MidnightBlue);
-    //Render1();
+    Render1();
     Render2();
+    Render3();
 }
 
 
@@ -41,4 +42,11 @@ void Game::Render2() {
     auto [vs, is] = shader_IndexTriangles.Alloc(&cb, std::size(vertices2), std::size(indices2));
     memcpy(vs, vertices2, sizeof(vertices2));
     memcpy(is, indices2, sizeof(indices2));
+}
+
+
+void Game::Render3() {
+    if (!scene.gameOver) {
+        scene.Update((float)deltaSecs);
+    }
 }

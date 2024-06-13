@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "looper.h"
+#include "robot.h"
 
 struct Game : Looper<Game> {
 
@@ -58,6 +59,9 @@ struct Game : Looper<Game> {
     xx::Task<> Render2Logic = Render2Logic_();
     xx::Task<> Render2Logic_();
     void Render2(); // draw rotate 3d cube
+
+    RobotSimulate::Scene scene;
+    void Render3(); // simulate robot battle ( text output )
 };
 
 #include "looper.hpp"
