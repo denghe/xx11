@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+﻿cmake_minimum_required(VERSION 3.10)
 
 set(name xx11)
 project(${name})
@@ -19,6 +19,7 @@ file(GLOB sources
 	src/*.hpp
 	src/*.cpp
 	src/*.c
+	3rd/xx/*.*
 )
 add_executable(${name} ${sources})
 

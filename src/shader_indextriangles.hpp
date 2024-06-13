@@ -89,7 +89,7 @@ inline int Shader_IndexTriangles::Commit() {
             assert(hr == S_OK);
             memcpy(mv.pData, verts.get(), vlen * sizeof(Vert));
             memcpy(mi.pData, idxs.get(), ilen * sizeof(UINT));
-            memcpy(mc.pData, constantBuffer.pointer, sizeof(ConstantBuffer));
+            memcpy(mc.pData, constantBuffer, sizeof(ConstantBuffer));
             ic->Unmap(cb.Get(), 0);
             ic->Unmap(ib.Get(), 0);
             ic->Unmap(vb.Get(), 0);
@@ -113,13 +113,13 @@ inline int Shader_IndexTriangles::Commit() {
         drawVerts += ilen;
         drawCall += 1;
         vlen = ilen = {};
-        constantBuffer.Reset();
+        constantBuffer = {};
     }
     return 0;
 }
 
 
-inline std::pair<Shader_IndexTriangles::Vert*, UINT*> Shader_IndexTriangles::Alloc(xx::Ref<ConstantBuffer> constantBuffer_, int32_t vnum, int32_t inum) {
+inline std::pair<Shader_IndexTriangles::Vert*, UINT*> Shader_IndexTriangles::Alloc(ConstantBuffer const* constantBuffer_, int32_t vnum, int32_t inum) {
     assert(gLooper.shader == this);
     assert(constantBuffer_);
     assert(vnum <= vcap);
@@ -129,7 +129,7 @@ inline std::pair<Shader_IndexTriangles::Vert*, UINT*> Shader_IndexTriangles::All
     if (vlen + vnum > vcap || ilen + inum > icap || (constantBuffer && constantBuffer != constantBuffer_)) {
         Commit();
     }
-    constantBuffer = std::move(constantBuffer_);
+    constantBuffer = constantBuffer_;
     std::pair<Shader_IndexTriangles::Vert*, UINT*> r{ &verts[vlen], &idxs[ilen] };
     vlen += vnum;
     ilen += inum;
