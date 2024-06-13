@@ -34,9 +34,9 @@ xx::Task<> Game::Render2Logic_() {
     }
 }
 
+
 void Game::Render2() {
     Render2Logic();
-
     ShaderSwitch(shader_IndexTriangles);
     auto [vs, is] = shader_IndexTriangles.Alloc(&cb, std::size(vertices2), std::size(indices2));
     memcpy(vs, vertices2, sizeof(vertices2));
