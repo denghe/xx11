@@ -49,4 +49,18 @@ void Game::Render3() {
     if (!scene.gameOver) {
         scene.Update((float)deltaSecs);
     }
-}
+
+    //static constexpr float frameDelaySeconds{ 1.f / 60 };
+
+    //auto secs = xx::NowEpochSeconds();
+    //size_t counter{};
+    //for (size_t i = 0; i < 100000; i++) {
+    //    RobotSimulate::Scene scene;
+    //    while (!scene.gameOver) {
+    //        scene.Update(frameDelaySeconds);
+    //        ++counter;
+    //    }
+    //}
+    //secs = xx::NowEpochSeconds(secs);
+    //xx::CoutN("counter = ", counter, " secs = ", secs, " eps = ", (counter / secs));
+} 
