@@ -217,15 +217,23 @@ namespace RobotSimulate {
     }
 
     inline xx::Task<bool> Robot::Attack() {
+        // target ensure
         if (!target) co_return false;
-        {
-            auto&& tree = target();
-            if (tree.Hit(*this)) {
-                scene->trees.Remove(target);
-                co_return false;
-            }
+        auto&& tree = target();
+
+        // attack range check
+        auto r = radius + attackRange;
+        auto rr = (tree.radius + r) * (tree.radius + r);
+        if (auto dp2 = DistancePow2(tree, *this); dp2 > rr) co_return false;    // out of range?
+
+        // attack
+        if (tree.Hit(*this)) {
+            scene->trees.Remove(target);    // dead: remove
         }
+
+        // simulate cast delay
         for (auto e = scene->now + attackDelaySeconds; scene->now < e;) co_yield 0;
+
         co_return true;
     }
 }
