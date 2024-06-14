@@ -35,9 +35,17 @@ namespace RobotSimulate {
         float attackDelaySeconds{}, attackRange{}, damage{};
         Tree_w target;
 
-        xx::Task<bool> SearchTarget();                      // let target = nearest tree. not found: return false
-        xx::Task<bool> MoveToTarget();                      // move a step. return robot & target 's distance < attackRange
-        xx::Task<bool> Attack();                            // let target's healthPoint -= damage, then sleep attackDelaySeconds. miss: return false
+        // let target = nearest tree.
+        // return true: success    false: not found
+        xx::Task<bool> SearchTarget();
+
+        // move a while.
+        // return 0: moving   1: reached   2: lost target
+        xx::Task<int> MoveToTarget();
+
+        // target.healthPoint -= damage, then sleep attackDelaySeconds.
+        // return 0: attack success   1: attack success + killed target   2: lost target   3: can't reach
+        xx::Task<int> Attack();                             
 
         xx::Task<> Update = Update_();
         xx::Task<> Update_();
@@ -53,26 +61,26 @@ namespace RobotSimulate {
       ┌────────────────────────────────────────────────┐
       │                                                │
       │                             ┌──┐               │
-    15│                             │  │tree           │
-      │                             └──┘               │
+    15│     robot1                  │1 │               │
+      │     ───►                    └──┘               │
       │                                                │
-      │                                                │
+      │                                   trees        │
       │                                   ┌──┐         │
-      │      robot                        │  │         │
-    35│      ───►                         └──┘         │
+      │                                   │2 │         │
+    35│                                   └──┘         │
       │                                                │
       │                                                │
       │                                                │
       │                           ┌──┐                 │
-    50│                           │  │                 │
-      │                           └──┘                 │
+    50│      robot2               │3 │                 │
+      │      ───►                 └──┘                 │
       │                                                │
       │                                                │
       └────────────────────────────────────────────────┘
      70
 
         */
-        static constexpr float cFramePerSeconds{ 60.f };
+        static constexpr float cFramePerSeconds{ 10.f };
         static constexpr float cFrameDelaySeconds{ 1.f / cFramePerSeconds };
 
         bool gameOver{};
@@ -83,7 +91,7 @@ namespace RobotSimulate {
 
         xx::Task<> Logic = Logic_();
         xx::Task<> Logic_() {
-            xx::CoutN("play");
+            Dump("play");
             // make some trees
             {
                 auto&& o = trees.Emplace();
@@ -109,12 +117,26 @@ namespace RobotSimulate {
                 o.radius = 10;
                 o.healthPoint = 5;
             }
-            // make a robot
+            // make 2 robots
             {
                 auto&& o = robots.Emplace();
                 o.scene = this;
-                o.name = "robot";
-                o.pos = { 15, 35 };
+                o.name = "robot1";
+                o.pos = { 15, 15 };
+                o.radius = 10;
+                o.healthPoint = 100;
+                o.searchDelaySeconds = 0.5f;
+                o.moveStepSeconds = 0.5f;
+                o.moveSpeed = 100.f / 5.f / cFramePerSeconds;
+                o.attackDelaySeconds = 1.f;
+                o.attackRange = 15;
+                o.damage = 1;
+            }
+            {
+                auto&& o = robots.Emplace();
+                o.scene = this;
+                o.name = "robot2";
+                o.pos = { 15, 50 };
                 o.radius = 10;
                 o.healthPoint = 100;
                 o.searchDelaySeconds = 0.5f;
@@ -134,7 +156,7 @@ namespace RobotSimulate {
                 co_yield 0;
             }
 
-            xx::CoutN("game over");
+            Dump("game over");
             gameOver = true;
         }
 
@@ -146,6 +168,14 @@ namespace RobotSimulate {
                 Logic();
             }
         }
+
+        template<typename...Args>
+        void Dump(Args&&... args) {
+            auto s = std::to_string(now);
+            if (s.size() < 10) s.append(10 - s.size(), ' ');
+            xx::Cout("[", s, "] ");
+            xx::CoutN(std::forward<Args>(args)...);
+        }
     };
 
 
@@ -154,34 +184,37 @@ namespace RobotSimulate {
         if (!co_await SearchTarget()) goto LabSearch;       // keep searching
 
     LabMove:
-        if (!target) goto LabSearch;                        // target is dead ? search again
-        if (!co_await MoveToTarget()) goto LabMove;         // far away from the target: keep moving
+        switch (co_await MoveToTarget()) {
+        case 0: goto LabMove;                               // far away from the target: keep moving
+        case 1: goto LabAttack;                             // reached target: begin attack
+        case 2: goto LabSearch;                             // lost target: search again
+        default: XX_ASSUME(false);
+        }
 
     LabAttack:
-        if (!co_await Attack()) goto LabMove;               // attack failed: move to target
-        if (!target) goto LabSearch;                        // target is dead: search again
-        goto LabAttack;                                     // keep attacking
+        switch (co_await Attack()) {
+        case 0: goto LabAttack;                             // attack success: keep attacking
+        case 1: goto LabLoot;                               // attack success + target is dead: loot
+        case 2: goto LabSearch;                             // lost target: search again
+        case 3: goto LabMove;                               // far away from the target: move to target
+        default: XX_ASSUME(false);
+        }
+
+    LabLoot:
+        // todo
+        goto LabSearch;
     }
 
     inline bool Item::Hit(Robot& attacker) {
         healthPoint -= attacker.damage;
-        if (healthPoint <= 0) {
-            xx::CoutN(attacker.name, " killed ", name, " !");
-            return true;
-        } else {
-            xx::CoutN(attacker.name, " hit ", name, " and deal ", attacker.damage," damage ! tree's HP = ", healthPoint);
-            return false;
-        }
+        scene->Dump(attacker.name, " hit ", name, " and deal ", attacker.damage," damage ! tree's HP = ", healthPoint);
+        return healthPoint <= 0;
     }
 
     inline xx::Task<bool> Robot::SearchTarget() {
-        xx::CoutN(name, " is searching target ...");
-        assert(!target);
+        scene->Dump(name, " call SearchTarget() ******************************");
 
-        // sleep
-        for (auto e = scene->now + searchDelaySeconds; scene->now < e;) co_yield 0;
-
-        // search
+        target.Reset();
         float minDistancePow2{ std::numeric_limits<float>::max() };
         scene->trees.ForeachFlags([&](Tree& tree)->void {
             if (auto dp2 = DistancePow2(tree, *this); dp2 < minDistancePow2) {
@@ -190,50 +223,73 @@ namespace RobotSimulate {
             }
         });
 
+        for (auto e = scene->now + searchDelaySeconds; scene->now < e;) {
+            scene->Dump(name, " is waiting search delay. left seconds = ", e - scene->now);
+            co_yield 0;
+        }
+
         if (target) {
-            xx::CoutN(name, " found target: ", target().name, " !");
+            scene->Dump(name, " found target: ", target().name, " !");
             co_return true;
         }
         co_return false;
     }
 
-    inline xx::Task<bool> Robot::MoveToTarget() {
+    inline xx::Task<int> Robot::MoveToTarget() {
+        scene->Dump(name, " call MoveToTarget() ******************************");
         for (auto e = scene->now + moveStepSeconds; scene->now < e;) {
-            if (!target) co_return false;
+            if (!target) {
+                scene->Dump(name, " MoveToTarget(): lost target");
+                co_return 2;
+            }
             auto&& tree = target();
             auto d = tree.pos - pos;
             auto r = radius + attackRange;
             auto rr = (tree.radius + r) * (tree.radius + r);
             auto dd = d.x * d.x + d.y * d.y;
-            if (rr > dd) co_return true;                    // cross
+            if (rr > dd) {
+                scene->Dump(name, " MoveToTarget(): reached");
+                co_return 1;
+            }
             if (dd > 0.f) {
                 auto v = d / std::sqrt(dd);		// normalize
                 pos += v * moveSpeed;                       // move
-                xx::CoutN(name, " is moving to ", target().name, ". pos = ", pos.x, ", ", pos.y);
+                scene->Dump(name, " is moving to ", target().name, ". pos = ", pos.x, ", ", pos.y);
             }
             co_yield 0;
         }
-        co_return false;
+        co_return 0;                                        // moving
     }
 
-    inline xx::Task<bool> Robot::Attack() {
-        // target ensure
-        if (!target) co_return false;
-        auto&& tree = target();
+    inline xx::Task<int> Robot::Attack() {
+        scene->Dump(name, " call Attack() ******************************");
+        if (!target) {
+            scene->Dump(name, " Attack(): lost target");
+            co_return 2;
+        }
 
-        // attack range check
+        auto&& tree = target(); // unsafe: avoid visit after yield
+
         auto r = radius + attackRange;
         auto rr = (tree.radius + r) * (tree.radius + r);
-        if (auto dp2 = DistancePow2(tree, *this); dp2 > rr) co_return false;    // out of range?
+        if (auto dp2 = DistancePow2(tree, *this); dp2 > rr) {
+            scene->Dump(name, " Attack(): out of attack range");
+            co_return 3;
+        }
 
-        // attack
-        if (tree.Hit(*this)) {
-            scene->trees.Remove(target);    // dead: remove
+        bool targetIsDead = tree.Hit(*this);
+        if (targetIsDead) {
+            scene->Dump(name, " killed ", tree.name, " !!!!!!!!!!!!!!!!!!!!!");
+            scene->trees.Remove(target);    // can't visit "tree" after this line
         }
 
         // simulate cast delay
-        for (auto e = scene->now + attackDelaySeconds; scene->now < e;) co_yield 0;
+        for (auto e = scene->now + attackDelaySeconds; scene->now < e;) {
+            scene->Dump(name, " is waiting for attack cast delay. left seconds = ", e - scene->now);
+            co_yield 0;
+        }
 
-        co_return true;
+        if (targetIsDead) co_return 1;                      // attack success + killed target
+        co_return 0;                                        // attack success
     }
 }
