@@ -4,7 +4,7 @@
 #define _XX11_H_
 
 #include <xx_task.h>
-#include <xx_xy.h>
+#include <xx_math.h>
 
 #include <d3d11_1.h>
 #include <directxcolors.h>

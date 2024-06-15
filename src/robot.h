@@ -15,16 +15,7 @@ namespace RobotSimulate {
         bool Hit(Robot& attacker);                          // return true: death
     };
 
-    inline float DistancePow2(float x1, float y1, float x2, float y2) {
-        return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-    }
-
-    inline float DistancePow2(Item const& a, Item const& b) {
-        return DistancePow2(a.pos.x, a.pos.y, b.pos.x, b.pos.y);
-    }
-
-    struct Tree : Item {
-    };
+    struct Tree : Item {};
 
     using Trees = xx::BlockLink<Tree>;
     using Tree_w = Trees::WeakType;
@@ -171,10 +162,12 @@ namespace RobotSimulate {
 
         template<typename...Args>
         void Dump(Args&&... args) {
+#if !ENABLE_SCENE_PERFORMANCE_TEST
             auto s = std::to_string(now);
             if (s.size() < 10) s.append(10 - s.size(), ' ');
             xx::Cout("[", s, "] ");
             xx::CoutN(std::forward<Args>(args)...);
+#endif
         }
     };
 
@@ -217,8 +210,8 @@ namespace RobotSimulate {
         target.Reset();
         float minDistancePow2{ std::numeric_limits<float>::max() };
         scene->trees.ForeachFlags([&](Tree& tree)->void {
-            if (auto dp2 = DistancePow2(tree, *this); dp2 < minDistancePow2) {
-                minDistancePow2 = dp2;
+            if (auto mag2 = (tree.pos - pos).Mag2(); mag2 < minDistancePow2) {
+                minDistancePow2 = mag2;
                 target = tree;
             }
         });
@@ -246,13 +239,13 @@ namespace RobotSimulate {
             auto d = tree.pos - pos;
             auto r = radius + attackRange;
             auto rr = (tree.radius + r) * (tree.radius + r);
-            auto dd = d.x * d.x + d.y * d.y;
-            if (rr > dd) {
+            auto mag2 = d.Mag2();
+            if (rr > mag2) {
                 scene->Dump(name, " MoveToTarget(): reached");
                 co_return 1;
             }
-            if (dd > 0.f) {
-                auto v = d / std::sqrt(dd);		// normalize
+            if (mag2 > 0.f) {
+                auto v = d / std::sqrt(mag2);		// normalize
                 pos += v * moveSpeed;                       // move
                 scene->Dump(name, " is moving to ", target().name, ". pos = ", pos.x, ", ", pos.y);
             }
@@ -272,7 +265,7 @@ namespace RobotSimulate {
 
         auto r = radius + attackRange;
         auto rr = (tree.radius + r) * (tree.radius + r);
-        if (auto dp2 = DistancePow2(tree, *this); dp2 > rr) {
+        if (auto mag2 = (tree.pos - pos).Mag2(); mag2 > rr) {
             scene->Dump(name, " Attack(): out of attack range");
             co_return 3;
         }

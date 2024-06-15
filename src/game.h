@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "looper.h"
+
+#define ENABLE_SCENE_PERFORMANCE_TEST 0
 #include "robot.h"
 
 struct Game : Looper<Game> {
@@ -60,7 +62,9 @@ struct Game : Looper<Game> {
     xx::Task<> Render2Logic_();
     void Render2(); // draw rotate 3d cube
 
+#if !ENABLE_SCENE_PERFORMANCE_TEST
     RobotSimulate::Scene scene;
+#endif
     void Render3(); // simulate robot battle ( text output )
 };
 
