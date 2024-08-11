@@ -39,3 +39,7 @@ https://www.cnblogs.com/X-Jun/p/10189305.html#_lab2_0_2
 ```
 SetConsoleOutputCP(CP_UTF8);
 ```
+
+# git command line
+
+git submodule update --remote               [target dir (optional)]
