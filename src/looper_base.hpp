@@ -30,6 +30,7 @@ Looper<Derived>::~Looper() {
     if (immediateContext) immediateContext->ClearState();
 }
 
+static constexpr UINT const MESSAGE_UPDATE = WM_USER + 12345;
 
 template<typename Derived>
 LRESULT CALLBACK Looper<Derived>::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -50,16 +51,25 @@ LRESULT CALLBACK Looper<Derived>::WndProc(HWND hWnd, UINT message, WPARAM wParam
         PostQuitMessage(__LINE__);
         break;
 
+    case MESSAGE_UPDATE:
+        gLooper.Frame();
+        break;
+
         // Note that this tutorial does not handle resizing (WM_SIZE) requests,
         // so we created the window without the resize border.
-
-    default:
-        XX_ASSUME(false);
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
+template<typename Derived>
+XX_INLINE void Looper<Derived>::Frame() {
+    FrameBegin();
+    RenderBegin();
+    ((Derived*)this)->Render();
+    RenderEnd();
+    FrameEnd();
+}
 
 template<typename Derived>
 int Looper<Derived>::Run() {
@@ -67,15 +77,13 @@ int Looper<Derived>::Run() {
 
     BeforeRun();
 
-#if 1
     bool stoped{};
+
+#if 0
+
     std::thread t{ [&] {
         while (!stoped) {
-            FrameBegin();
-            RenderBegin();
-            ((Derived*)this)->Render();
-            RenderEnd();
-            FrameEnd();
+            Frame();
         }
     } };
 
@@ -86,22 +94,30 @@ int Looper<Derived>::Run() {
         }
     }
 
-    stoped = true;
-    t.join();
 #else
+
+    std::thread t{ [&] {
+        Sleep(1000);    // wait dx init
+        while (!stoped) {
+            SendMessageTimeout(hWnd, MESSAGE_UPDATE, 0, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK
+                | SMTO_NOTIMEOUTIFNOTHUNG | SMTO_ERRORONEXIT, 1000, {});
+            Sleep(30);
+        }
+    } };
+
     while (WM_QUIT != msg.message) {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
-        } else {
-            FrameBegin();
-            RenderBegin();
-            ((Derived*)this)->Render();
-            RenderEnd();
-            FrameEnd();
+        } else if (MESSAGE_UPDATE != msg.message) {
+            Frame();
         }
     }
+
 #endif
+
+    stoped = true;
+    t.join();
 
     return (int)msg.wParam;
 }

@@ -78,4 +78,6 @@ protected:
 	void RenderBegin();					// set default shader
 	void RenderEnd();					// current shader commit + swapChain->Present
 	void FrameEnd();
+
+	void Frame();						// BeforeRun .... FrameEnd
 };
