@@ -26,5 +26,5 @@ struct Shader_IndexTriangles : Shader {
 
     int Init() override;
     int Commit() override;
-    std::pair<Vert*, UINT*> Alloc(ConstantBuffer const* constantBuffer_, int32_t vnum, int32_t inum);
+    std::pair<Vert*, UINT*> Alloc(ConstantBuffer const* constantBuffer_, UINT vnum, UINT inum);
 };

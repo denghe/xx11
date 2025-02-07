@@ -27,7 +27,7 @@ float4 ps_main(VertexOut pIn) : SV_Target {
 
 )#" };
 
-    if (auto r = CompileShader(src, layout, std::size(layout))) 
+    if (auto r = CompileShader(src, layout, (UINT)std::size(layout))) 
         return r;
 
     verts = std::make_unique<Vert[]>(vcap);

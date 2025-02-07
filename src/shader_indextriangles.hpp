@@ -35,7 +35,7 @@ float4 ps_main(VertexOut pIn) : SV_Target {
 
 )#" };
 
-    if (auto r = CompileShader(src, layout, std::size(layout))) 
+    if (auto r = CompileShader(src, layout, (UINT)std::size(layout)))
         return r;
 
     verts = std::make_unique<Vert[]>(vcap);
@@ -119,7 +119,7 @@ inline int Shader_IndexTriangles::Commit() {
 }
 
 
-inline std::pair<Shader_IndexTriangles::Vert*, UINT*> Shader_IndexTriangles::Alloc(ConstantBuffer const* constantBuffer_, int32_t vnum, int32_t inum) {
+inline std::pair<Shader_IndexTriangles::Vert*, UINT*> Shader_IndexTriangles::Alloc(ConstantBuffer const* constantBuffer_, UINT vnum, UINT inum) {
     assert(gLooper.shader == this);
     assert(constantBuffer_);
     assert(vnum <= vcap);

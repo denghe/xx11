@@ -210,7 +210,9 @@ namespace RobotSimulate {
         target.Reset();
         float minDistancePow2{ std::numeric_limits<float>::max() };
         scene->trees.ForeachFlags([&](Tree& tree)->void {
-            if (auto mag2 = (tree.pos - pos).Mag2(); mag2 < minDistancePow2) {
+            auto d = tree.pos - pos;
+            auto mag2 = d.x * d.x + d.y * d.y;
+            if (mag2 < minDistancePow2) {
                 minDistancePow2 = mag2;
                 target = tree;
             }
@@ -239,7 +241,7 @@ namespace RobotSimulate {
             auto d = tree.pos - pos;
             auto r = radius + attackRange;
             auto rr = (tree.radius + r) * (tree.radius + r);
-            auto mag2 = d.Mag2();
+            auto mag2 = d.x * d.x + d.y * d.y;
             if (rr > mag2) {
                 scene->Dump(name, " MoveToTarget(): reached");
                 co_return 1;
@@ -265,7 +267,9 @@ namespace RobotSimulate {
 
         auto r = radius + attackRange;
         auto rr = (tree.radius + r) * (tree.radius + r);
-        if (auto mag2 = (tree.pos - pos).Mag2(); mag2 > rr) {
+        auto d = tree.pos - pos;
+        auto mag2 = d.x * d.x + d.y * d.y;
+        if (mag2 > rr) {
             scene->Dump(name, " Attack(): out of attack range");
             co_return 3;
         }

@@ -3,15 +3,17 @@
 set(name xx11)
 project(${name})
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include_directories(
 	src/
+	3rd/
+	3rd/soloud/include
+	3rd/FixPointCS/Cpp
 	3rd/nameof/include
 	3rd/xx
-	3rd/
 )
 
 file(GLOB sources
@@ -19,14 +21,25 @@ file(GLOB sources
 	src/*.hpp
 	src/*.cpp
 	src/*.c
-	3rd/xx/*.*
+	3rd/xx/*.h
 )
+
+if(MSVC)
+	list(APPEND sources "../xx/xx.natvis")
+endif()
+
 add_executable(${name} ${sources})
 
 source_group("" FILES ${sources})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../ FILES ${sources})
 
 target_link_libraries(${name} winmm d3d11 d3dcompiler dxguid)	# dxgi ?
+
+SET(MI_BUILD_TESTS OFF CACHE BOOL "MI_BUILD_TESTS" FORCE)
+SET(MI_BUILD_SHARED OFF CACHE BOOL "MI_BUILD_SHARED" FORCE)
+SET(MI_BUILD_OBJECT OFF CACHE BOOL "MI_BUILD_OBJECT" FORCE)
+add_subdirectory(../mimalloc mimalloc)
+target_link_libraries(${name} mimalloc-static)
 
 if(MSVC)
 

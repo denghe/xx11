@@ -4,3 +4,12 @@
 [submodule "3rd/xx"]
 	path = 3rd/xx
 	url = https://github.com/denghe/xx.git
+[submodule "3rd/mimalloc"]
+	path = 3rd/mimalloc
+	url = https://github.com/microsoft/mimalloc.git
+[submodule "3rd/soloud"]
+	path = 3rd/soloud
+	url = https://github.com/denghe/soloud.git
+[submodule "3rd/FixPointCS"]
+	path = 3rd/FixPointCS
+	url = https://github.com/XMunkki/FixPointCS.git
