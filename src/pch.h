@@ -16,7 +16,4 @@ using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 using XY = xx::XY;
 
-struct Game;
-extern Game gLooper;
-
 #endif

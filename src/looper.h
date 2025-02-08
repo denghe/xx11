@@ -7,6 +7,9 @@
 #include "shader_quadinstance.h"
 // ...
 
+struct Game;
+extern Game gLooper;
+
 template<typename Derived>
 struct Looper {
 

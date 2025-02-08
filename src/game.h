@@ -6,7 +6,10 @@
 
 struct Game : Looper<Game> {
 
-    void Render();
+    void Render();  // root
+
+    /*****************************************************************************************/
+    /*****************************************************************************************/
 
     // simple trangle
     static constexpr Shader_Triangles::Vert vertices1[]{
@@ -17,6 +20,8 @@ struct Game : Looper<Game> {
 
     void Render1(); // draw simple trangle
 
+    /*****************************************************************************************/
+    /*****************************************************************************************/
 
     //    5________ 6
     //    /|      /|
@@ -62,10 +67,11 @@ struct Game : Looper<Game> {
     xx::Task<> Render2Logic_();
     void Render2(); // draw rotate 3d cube
 
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+
 #if !ENABLE_SCENE_PERFORMANCE_TEST
     RobotSimulate::Scene scene;
 #endif
     void Render3(); // simulate robot battle ( text output )
 };
-
-#include "looper.hpp"
