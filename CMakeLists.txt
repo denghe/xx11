@@ -25,7 +25,7 @@ file(GLOB sources
 )
 
 if(MSVC)
-	list(APPEND sources "../xx/xx.natvis")
+	list(APPEND sources "3rd/xx/xx.natvis")
 endif()
 
 add_executable(${name} ${sources})
@@ -38,7 +38,7 @@ target_link_libraries(${name} winmm d3d11 d3dcompiler dxguid)	# dxgi ?
 SET(MI_BUILD_TESTS OFF CACHE BOOL "MI_BUILD_TESTS" FORCE)
 SET(MI_BUILD_SHARED OFF CACHE BOOL "MI_BUILD_SHARED" FORCE)
 SET(MI_BUILD_OBJECT OFF CACHE BOOL "MI_BUILD_OBJECT" FORCE)
-add_subdirectory(../mimalloc mimalloc)
+add_subdirectory(3rd/mimalloc mimalloc)
 target_link_libraries(${name} mimalloc-static)
 
 if(MSVC)
