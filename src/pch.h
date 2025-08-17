@@ -5,11 +5,13 @@
 
 #include <xx_task.h>
 #include <xx_math.h>
+#include <xx_file.h>
 
 #include <d3d11_1.h>
 #include <directxcolors.h>
 #include <d3dcompiler.h>
 #include <wrl/client.h>		// ComPtr
+#include <DDSTextureLoader11.h>
 
 template<typename T>
 using ComPtr = Microsoft::WRL::ComPtr<T>;

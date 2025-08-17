@@ -13,6 +13,7 @@ include_directories(
 	3rd/soloud/include
 	3rd/FixPointCS/Cpp
 	3rd/nameof/include
+	3rd/ms
 	3rd/xx
 )
 
@@ -21,6 +22,7 @@ file(GLOB sources
 	src/*.hpp
 	src/*.cpp
 	src/*.c
+	3rd/ms/*.*
 	3rd/xx/*.h
 )
 

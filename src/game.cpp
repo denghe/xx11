@@ -16,11 +16,25 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
     if (int r = gLooper.Init(hInstance, nCmdShow, true))
         return 0;
 
+    if (int r = xx::ReadAllBytes("res/a.dds", gLooper.fileData)) {
+        return r;
+    }
+
     return gLooper.Run();
 }
 
 void Game::Render() {
     ClearView(DirectX::Colors::MidnightBlue);
+
+    auto secs = xx::NowEpochSeconds();
+    for (int i = 0; i < 100; ++i) {
+        ComPtr<ID3D11ShaderResourceView> tex;
+        auto r = DirectX::CreateDDSTextureFromMemory(d3dDevice.Get(), fileData.buf, fileData.len, nullptr, tex.GetAddressOf());
+        //auto r = DirectX::CreateDDSTextureFromFile(d3dDevice.Get(), L"res\\a.dds", nullptr, tex.GetAddressOf());
+        assert(r >= 0);
+    }
+    xx::CoutN("load a.dds 100 times. secs = ", xx::NowEpochSeconds(secs));
+
     Render1();
     Render2();
     Render3();
