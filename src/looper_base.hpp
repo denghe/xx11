@@ -51,9 +51,27 @@ LRESULT CALLBACK Looper<Derived>::WndProc(HWND hWnd, UINT message, WPARAM wParam
         PostQuitMessage(__LINE__);
         break;
 
-    case MESSAGE_UPDATE:
+    /******************************************************************************************************/
+    // Keeping things moving during Win32 Move/Resize events
+    // https://gamedev.net/forums/topic/672094-keeping-things-moving-during-win32-moveresize-events/5254386/
+    case WM_NCLBUTTONDOWN:
+        if (SendMessage(hWnd, WM_NCHITTEST, wParam, lParam) == HTCAPTION) {
+            POINT point;
+            GetCursorPos(&point);
+            ScreenToClient(hWnd, &point);
+            PostMessage(hWnd, WM_MOUSEMOVE, 0, point.x | point.y << 16);
+        }
+        break;
+    case WM_ENTERSIZEMOVE:
+        SetTimer(hWnd, 1, 0, NULL);
+        break;
+    case WM_EXITSIZEMOVE:
+        KillTimer(hWnd, 1);
+        break;
+    case WM_TIMER:
         gLooper.Frame();
         break;
+    /******************************************************************************************************/
 
         // Note that this tutorial does not handle resizing (WM_SIZE) requests,
         // so we created the window without the resize border.
@@ -77,47 +95,13 @@ int Looper<Derived>::Run() {
 
     BeforeRun();
 
-    bool stoped{};
-
-#if 0
-
-    std::thread t{ [&] {
-        while (!stoped) {
-            Frame();
-        }
-    } };
-
     while (WM_QUIT != msg.message) {
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+        Frame();
     }
-
-#else
-
-    std::thread t{ [&] {
-        Sleep(1000);    // wait dx init
-        while (!stoped) {
-            SendMessageTimeout(hWnd, MESSAGE_UPDATE, 0, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK
-                | SMTO_NOTIMEOUTIFNOTHUNG | SMTO_ERRORONEXIT, 1000, {});
-            Sleep(30);
-        }
-    } };
-
-    while (WM_QUIT != msg.message) {
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        } else if (MESSAGE_UPDATE != msg.message) {
-            Frame();
-        }
-    }
-
-#endif
-
-    stoped = true;
-    t.join();
 
     return (int)msg.wParam;
 }
